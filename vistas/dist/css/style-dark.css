@@ -7,7 +7,7 @@
 @import "icons/font-awesome/css/fontawesome-all.css";
 .left-sidebar {
   border-right: 1px solid #333f55 !important;
-  background-color: #2A3447 !important;
+  background-color: #040303 !important;
 }
 .left-sidebar .nav-small-cap {
   color: #7C8FAC;
@@ -140,7 +140,7 @@
   --bs-body-line-height: 1.5;
   --bs-body-color: #7C8FAC;
   --bs-body-color-rgb: 124, 143, 172;
-  --bs-body-bg: #2A3447;
+  --bs-body-bg: #040303;
   --bs-body-bg-rgb: 42, 52, 71;
   --bs-emphasis-color: #000;
   --bs-emphasis-color-rgb: 0, 0, 0;
@@ -2376,7 +2376,7 @@ progress {
   --bs-table-border-color: #333F55;
   --bs-table-accent-bg: transparent;
   --bs-table-striped-color: var(--bs-body-color);
-  --bs-table-striped-bg: #2A3447;
+  --bs-table-striped-bg: #040303;
   --bs-table-active-color: var(--bs-body-color);
   --bs-table-active-bg: rgba(0, 0, 0, 0.1);
   --bs-table-hover-color: var(--bs-body-color);
@@ -2786,7 +2786,7 @@ textarea.form-control-lg {
   font-weight: 400;
   line-height: 1.5;
   color: #EAEFF4;
-  background-color: #2A3447;
+  background-color: #040303;
   background-image: var(--bs-form-select-bg-img), var(--bs-form-select-bg-icon, none);
   background-repeat: no-repeat;
   background-position: right 16px center;
@@ -2979,10 +2979,10 @@ textarea.form-control-lg {
   outline: 0;
 }
 .form-range:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 1px #2A3447, 0 0 0 0.25rem rgba(93, 135, 255, 0.25);
+  box-shadow: 0 0 0 1px #040303, 0 0 0 0.25rem rgba(93, 135, 255, 0.25);
 }
 .form-range:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 1px #2A3447, 0 0 0 0.25rem rgba(93, 135, 255, 0.25);
+  box-shadow: 0 0 0 1px #040303, 0 0 0 0.25rem rgba(93, 135, 255, 0.25);
 }
 .form-range::-moz-focus-outer {
   border: 0;
@@ -4448,7 +4448,7 @@ textarea.form-control-lg {
   --bs-dropdown-spacer: 0.125rem;
   --bs-dropdown-font-size:0.875rem;
   --bs-dropdown-color: var(--bs-body-color);
-  --bs-dropdown-bg: #2A3447;
+  --bs-dropdown-bg: #040303;
   --bs-dropdown-border-color: var(--bs-border-color-translucent);
   --bs-dropdown-border-radius: 7px;
   --bs-dropdown-border-width: 0;
@@ -5441,7 +5441,7 @@ textarea.form-control-lg {
   --bs-card-cap-color: ;
   --bs-card-height: ;
   --bs-card-color: ;
-  --bs-card-bg: #2A3447;
+  --bs-card-bg: #040303;
   --bs-card-img-overlay-padding: 1rem;
   --bs-card-group-margin: 0.75rem;
   position: relative;
@@ -6129,7 +6129,7 @@ textarea.form-control-lg {
 .progress-stacked {
   --bs-progress-height: 7px;
   --bs-progress-font-size:0.65625rem;
-  --bs-progress-bg: #2A3447;
+  --bs-progress-bg: #040303;
   --bs-progress-border-radius: var(--bs-border-radius);
   --bs-progress-box-shadow: var(--bs-box-shadow-inset);
   --bs-progress-bar-color: #fff;
@@ -7695,7 +7695,7 @@ textarea.form-control-lg {
   --bs-offcanvas-padding-x: 1rem;
   --bs-offcanvas-padding-y: 1rem;
   --bs-offcanvas-color: var(--bs-body-color);
-  --bs-offcanvas-bg: #2A3447;
+  --bs-offcanvas-bg: #040303;
   --bs-offcanvas-border-width: 0;
   --bs-offcanvas-border-color: var(--bs-border-color-translucent);
   --bs-offcanvas-box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -18498,7 +18498,7 @@ textarea.form-control-lg {
     display: none;
     z-index: 100;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-    background: #2A3447;
+    background: #040303;
     transition: cubic-bezier(0.075, 0.82, 0.165, 1);
   }
   #main-wrapper[data-layout=horizontal] .sidebar-nav #sidebarnav > .mega-dropdown {
@@ -22770,7 +22770,7 @@ html[dir=rtl] .welcome-bg-img {
 }
 
 body {
-  background-color: #2A3447 !important;
+  background-color: #040303 !important;
 }
 body .page-wrapper:before {
   background-color: #1f2738;
@@ -22809,7 +22809,7 @@ body .select2-container--default .select2-search--dropdown .select2-search__fiel
 body .select2-container--default .select2-selection--multiple,
 body .select2-container--classic .select2-selection--single,
 body .wizard-content .wizard > .steps > ul > li.current .step {
-  background-color: #2A3447 !important;
+  background-color: #040303 !important;
 }
 body .wizard-content .wizard.wizard-circle > .steps > ul > li.current:after,
 body .wizard-content .wizard.wizard-circle > .steps > ul > li.current ~ li:after,
@@ -22817,11 +22817,11 @@ body .wizard-content .wizard.wizard-circle > .steps > ul > li.current ~ li:befor
   background-color: #333F55 !important;
 }
 body .wizard-content .wizard.wizard-circle > .steps .step {
-  background-color: #2A3447;
+  background-color: #040303;
 }
 body .bootstrap-switch .bootstrap-switch-label,
 body .preloader {
-  background: #2A3447 !important;
+  background: #040303 !important;
 }
 body .accordion-button.collapsed::after,
 body .btn-close {
@@ -22849,23 +22849,23 @@ body .table-light {
   --bs-table-bg: $body-bg !important;
 }
 body .table .bg-light {
-  background-color: #2A3447 !important;
+  background-color: #040303 !important;
 }
 body #main-wrapper[data-layout=vertical] .app-header.fixed-header .navbar {
-  background: #2A3447;
+  background: #040303;
 }
 body .btn-light,
 body .btn.show {
-  background-color: #2A3447;
-  border-color: #2A3447;
+  background-color: #040303;
+  border-color: #040303;
 }
 body .btn-light:hover,
 body .btn.show:hover {
-  background-color: #2A3447;
-  border-color: #2A3447;
+  background-color: #040303;
+  border-color: #040303;
 }
 body .app-chat-offcanvas {
-  background-color: #2A3447;
+  background-color: #040303;
 }
 @media (max-width: 991.98px) {
   body .app-email-chatting-box {
@@ -22874,10 +22874,10 @@ body .app-chat-offcanvas {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #2A3447;
+    background-color: #040303;
   }
   body .navbar-collapse {
-    background-color: #2A3447;
+    background-color: #040303;
   }
 }
 
@@ -22885,7 +22885,7 @@ body .app-chat-offcanvas {
   position: relative;
   z-index: 50;
   width: 100%;
-  background: #2A3447;
+  background: #040303;
   padding: 0 25px;
 }
 .app-header .container-fluid, .app-header .container-sm, .app-header .container-md, .app-header .container-lg, .app-header .container-xl, .app-header .container-xxl {
@@ -30504,7 +30504,7 @@ table.footable thead tr.footable-filtering th ul.dropdown-menu li .checkbox labe
   justify-content: center;
   box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3);
   border-radius: 100%;
-  background-color: #2A3447;
+  background-color: #040303;
   font-weight: 700;
 }
 
@@ -30534,7 +30534,7 @@ table.footable thead tr.footable-filtering th ul.dropdown-menu li .checkbox labe
 }
 
 .scrumboard .card {
-  background: #2A3447;
+  background: #040303;
   border: none;
   border-radius: 12px;
   margin-bottom: 15px;
@@ -30592,7 +30592,7 @@ table.footable thead tr.footable-filtering th ul.dropdown-menu li .checkbox labe
   margin-bottom: 36px;
   border-radius: 15px;
   border: 2px dashed #5D87FF;
-  background-color: #2A3447;
+  background-color: #040303;
   box-shadow: rgba(145, 158, 171, 0.3) 0px 0px 2px 0px, rgba(145, 158, 171, 0.02) 0px 12px 24px -4px;
   background-image: linear-gradient(45deg, rgba(93, 135, 255, 0.09) 25%, transparent 25%, transparent 50%, rgba(93, 135, 255, 0.09) 50%, rgba(93, 135, 255, 0.09) 75%, transparent 75%, transparent);
   background-size: 1rem 1rem;

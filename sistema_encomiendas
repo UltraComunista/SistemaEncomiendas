@@ -1,0 +1,155 @@
+-- Creación de la base de datos
+CREATE DATABASE IF NOT EXISTS sistema_encomiendas;
+USE sistema_encomiendas;
+
+-- Tabla de sucursales
+CREATE TABLE sucursal (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    departamento TINYINT,
+    provincia TINYINT,
+    direccion VARCHAR(100),
+    telefono INT,
+    estado TINYINT(1) -- 1: Activa, 0: Inactiva
+);
+
+-- Tabla de usuarios
+CREATE TABLE usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100),
+    cedula INT,
+    telefono VARCHAR(20),
+    direccion VARCHAR(100),
+    usuario VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    token VARCHAR(1000),
+    foto VARCHAR(255),
+    ultimoLogin DATETIME,
+    estado TINYINT(1), -- 1: Activo, 0: Inactivo
+    perfil TINYINT(1), -- 0: Usuario normal, 1: Administrador
+    idSucursal INT,
+    FOREIGN KEY (idSucursal) REFERENCES sucursal(id)
+);
+
+-- Tabla de clientes
+CREATE TABLE cliente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    cedula INT,
+    telefono VARCHAR(20),
+    direccion VARCHAR(100)
+);
+
+-- Tabla de categorías de encomiendas
+CREATE TABLE categoria (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50),
+    precio DECIMAL(5,2) -- Precio de la categoría
+);
+
+-- Tabla de detalles de la encomienda
+CREATE TABLE detalleEncomienda (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(50),
+    cantidad INT,
+    peso DECIMAL(5,2),
+    idCategoria INT,
+    FOREIGN KEY (idCategoria) REFERENCES categoria(id)
+);
+
+-- Tabla de pagos
+CREATE TABLE pagos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    idTransaccion INT,
+    metodoPago TINYINT, -- 0: Efectivo, 1: Tarjeta, 2: Transferencia
+    estadoPago TINYINT, -- 0: Pendiente, 1: Pagado
+    monto DECIMAL(10, 2)
+);
+
+-- Tabla de recepción de encomiendas
+CREATE TABLE recepcionEncomienda (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nro_registro INT UNIQUE,
+    estadoPaquete TINYINT, -- 0: Pendiente, 1: En tránsito, 2: Entregado
+    FechaRecepcion DATETIME,
+    TipoEnvio TINYINT, -- 0: Normal, 1: Express
+    idPagos INT,
+    idClienteR INT, -- Cliente receptor
+    idClienteE INT, -- Cliente emisor
+    idSucursalR INT, -- Sucursal receptora
+    idSucursalE INT, -- Sucursal emisora
+    idDetalle INT,
+    idUsuario INT, -- Usuario que recibe la encomienda
+    FOREIGN KEY (idPagos) REFERENCES pagos(id),
+    FOREIGN KEY (idClienteR) REFERENCES cliente(id),
+    FOREIGN KEY (idClienteE) REFERENCES cliente(id),
+    FOREIGN KEY (idSucursalR) REFERENCES sucursal(id),
+    FOREIGN KEY (idSucursalE) REFERENCES sucursal(id),
+    FOREIGN KEY (idDetalle) REFERENCES detalleEncomienda(id),
+    FOREIGN KEY (idUsuario) REFERENCES usuario(id)
+);
+
+-- Tabla de entrega de encomiendas
+CREATE TABLE entregaEncomienda (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATETIME,
+    idRecepcionEncomienda INT,
+    idUsuario INT, -- Usuario que entrega la encomienda
+    FOREIGN KEY (idRecepcionEncomienda) REFERENCES recepcionEncomienda(id),
+    FOREIGN KEY (idUsuario) REFERENCES usuario(id)
+);
+
+-- Tabla de auditoría para el historial del estado del paquete
+CREATE TABLE auditoriaEstadoPaquete (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    idEncomienda INT,
+    estadoAnterior TINYINT, -- Estado previo del paquete
+    estadoNuevo TINYINT, -- Estado nuevo del paquete
+    fechaCambio DATETIME, -- Fecha en la que cambió el estado
+    idUsuario INT, -- Usuario que realizó el cambio
+    FOREIGN KEY (idEncomienda) REFERENCES recepcionEncomienda(id),
+    FOREIGN KEY (idUsuario) REFERENCES usuario(id)
+);
+
+-- Trigger para registrar automáticamente los cambios de estado en la auditoría
+DELIMITER //
+CREATE TRIGGER after_estadoPaquete_update
+AFTER UPDATE ON recepcionEncomienda
+FOR EACH ROW
+BEGIN
+    -- Verificamos si el estado del paquete ha cambiado
+    IF OLD.estadoPaquete != NEW.estadoPaquete THEN
+        -- Insertamos el cambio en la tabla de auditoría
+        INSERT INTO auditoriaEstadoPaquete (idEncomienda, estadoAnterior, estadoNuevo, fechaCambio, idUsuario)
+        VALUES (NEW.id, OLD.estadoPaquete, NEW.estadoPaquete, NOW(), NEW.idUsuario);
+    END IF;
+END //
+DELIMITER ;
+
+-- Insertando algunos datos de ejemplo para categorías
+INSERT INTO categoria (nombre, precio) VALUES 
+('Documentos', 10.00),
+('Paquete Pequeño', 25.00),
+('Paquete Grande', 50.00);
+
+-- Insertando algunos datos de ejemplo para sucursales
+INSERT INTO sucursal (nombre, departamento, provincia, direccion, telefono, estado) VALUES 
+('Sucursal Central', 1, 1, 'Calle Principal 123', 12345678, 1),
+('Sucursal Sur', 2, 2, 'Avenida Libertad 456', 87654321, 1);
+
+-- Insertando un cliente de ejemplo
+INSERT INTO cliente (nombre, cedula, telefono, direccion) VALUES 
+('Juan Pérez', 1234567, '78945612', 'Av. Siempre Viva 742');
+
+-- Insertando un usuario de ejemplo
+INSERT INTO usuario (nombre, apellido, cedula, telefono, direccion, usuario, password, token, foto, ultimoLogin, estado, perfil, idSucursal) VALUES 
+('Ana', 'García', 7894561, '78945613', 'Calle Falsa 123', 'ana.garcia', MD5('password123'), '', '', NOW(), 1, 1, 1);
+
+-- Insertando una encomienda de ejemplo
+INSERT INTO recepcionEncomienda (nro_registro, estadoPaquete, FechaRecepcion, TipoEnvio, idPagos, idClienteR, idClienteE, idSucursalR, idSucursalE, idDetalle, idUsuario) VALUES 
+(10001, 0, NOW(), 0, NULL, 1, 1, 1, 2, NULL, 1);
+
+-- Insertando un historial de cambios de estado en la auditoría
+INSERT INTO auditoriaEstadoPaquete (idEncomienda, estadoAnterior, estadoNuevo, fechaCambio, idUsuario) VALUES 
+(1, 0, 1, NOW(), 1); -- Cambiar el estado de 'Pendiente' a 'En tránsito'

@@ -1,7 +1,7 @@
 Options -Indexes
 
 RewriteEngine On
-RewriteBase /Proyecto-web-Encomiendas/
+RewriteBase /SistemaEncomiendas/
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

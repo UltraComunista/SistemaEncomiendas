@@ -134,5 +134,7 @@ function toggleTheme(value) {
   var sheets = document.getElementById("themeColors");
   sheets.href = value;
   $(".preloader").fadeOut();
+  // Guardar el tema en localStorage
+  localStorage.setItem('selectedTheme', value);
 }
 $(".preloader").fadeOut();

@@ -67,24 +67,6 @@ $(document).ready(function () {
 
 
 $(document).ready(function () {
-    $('#tablaUsuarios').DataTable({
-        responsive: true,
-        language: {
-            search: "Buscar Usuario:",
-            lengthMenu: "Mostrar _MENU_ registros por página",
-            zeroRecords: "No se encontraron resultados",
-            info: "Mostrando página _PAGE_ de _PAGES_",
-            infoEmpty: "No hay registros disponibles",
-            infoFiltered: "(filtrado de _MAX_ registros en total)",
-            paginate: {
-                first: "Primero",
-                last: "Último",
-                next: "Siguiente",
-                previous: "Anterior"
-            }
-        }
-    });
-
     // Generar automáticamente el nombre de usuario y contraseña
     $("#addContactModalTitle input[name='nuevoNombre'], #addContactModalTitle input[name='nuevoApellido'], #addContactModalTitle input[name='nuevoCedula']").on("input", function () {
         var nombre = $("input[name='nuevoNombre']").val().trim();
@@ -116,19 +98,4 @@ $(document).ready(function () {
             $("#editarPassword").val(cedula);
         }
     });
-
-
-
-
-
-
-
-
-    // Manejar la generación de reportes
-    $("#btn-reportes").on("click", function () {
-        window.open("extensiones/tcpdf/pdf/reporteusuario.php", "_blank");
-    });
-
-
-
 });

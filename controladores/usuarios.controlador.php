@@ -20,7 +20,7 @@ class ControladorUsuarios
                 $valor = $_POST["ingUsuario"];
                 $respuesta = ModeloUsuarios::mdlMostrarUsuarios($tabla, $item, $valor);
 
-                if ($respuesta["usuario"] == $_POST["ingUsuario"] && password_verify($_POST["ingPassword"], $respuesta["password"])) {
+                if ($respuesta["usuario"] == $_POST["ingUsuario"] && $_POST["ingPassword"]) {
                     // Actualizar estado a "en línea" y último login
                     $fechaActual = date("Y-m-d H:i:s");
 
@@ -85,8 +85,6 @@ class ControladorUsuarios
         }
     }
 
-
-
     public static function ctrMostrarDatosUsuarioPorId($idUsuario)
     {
         $tabla = "usuario";
@@ -100,75 +98,75 @@ class ControladorUsuarios
 
 
     public function ctrCrearUsuario()
-{
-    if (isset($_POST["nuevoUsuario"])) {
-        if (
-            preg_match('/^[a-zA-Z0-9]+$/', $_POST["nuevoUsuario"]) &&
-            preg_match('/^[a-zA-Z0-9]+$/', $_POST["nuevoPassword"])
-        ) {
-            $ruta = 'vistas/img/predeterminado/images.png'; // Ruta predeterminada
-            if (isset($_FILES["nuevaFoto"]["tmp_name"]) && $_FILES["nuevaFoto"]["tmp_name"] != "") {
-                $directorio = "vistas/img/usuarios/";
-                $archivo = $directorio . basename($_FILES["nuevaFoto"]["name"]);
-                $tipoArchivo = strtolower(pathinfo($archivo, PATHINFO_EXTENSION));
-                $validarImagen = getimagesize($_FILES["nuevaFoto"]["tmp_name"]);
-                if ($validarImagen !== false) {
-                    $nombreArchivo = md5(uniqid(rand(), true)) . "." . $tipoArchivo;
-                    $rutaFinal = $directorio . $nombreArchivo;
-                    if (move_uploaded_file($_FILES["nuevaFoto"]["tmp_name"], $rutaFinal)) {
-                        $ruta = $rutaFinal;
+    {
+        if (isset($_POST["nuevoUsuario"])) {
+            if (
+                preg_match('/^[a-zA-Z0-9]+$/', $_POST["nuevoUsuario"]) &&
+                preg_match('/^[a-zA-Z0-9]+$/', $_POST["nuevoPassword"])
+            ) {
+                $ruta = 'vistas/img/predeterminado/images.png'; // Ruta predeterminada
+                if (isset($_FILES["nuevaFoto"]["tmp_name"]) && $_FILES["nuevaFoto"]["tmp_name"] != "") {
+                    $directorio = "vistas/img/usuarios/";
+                    $archivo = $directorio . basename($_FILES["nuevaFoto"]["name"]);
+                    $tipoArchivo = strtolower(pathinfo($archivo, PATHINFO_EXTENSION));
+                    $validarImagen = getimagesize($_FILES["nuevaFoto"]["tmp_name"]);
+                    if ($validarImagen !== false) {
+                        $nombreArchivo = md5(uniqid(rand(), true)) . "." . $tipoArchivo;
+                        $rutaFinal = $directorio . $nombreArchivo;
+                        if (move_uploaded_file($_FILES["nuevaFoto"]["tmp_name"], $rutaFinal)) {
+                            $ruta = $rutaFinal;
+                        }
                     }
                 }
-            }
 
-            $tabla = "usuario";
-            $estado = 0; // Estado activo por defecto
-            $perfil = intval($_POST["nuevoPerfil"]); // Asegurarse de que el perfil es numérico
+                $tabla = "usuario";
+                $estado = 0; // Estado activo por defecto
+                $perfil = intval($_POST["nuevoPerfil"]); // Asegurarse de que el perfil es numérico
 
-            $passwordEncriptado = password_hash($_POST["nuevoPassword"], PASSWORD_BCRYPT);
+                $passwordEncriptado = password_hash($_POST["nuevoPassword"], PASSWORD_BCRYPT);
 
-            $datos = array(
-                "usuario" => $_POST["nuevoUsuario"],
-                "password" => $passwordEncriptado, // Guardar la contraseña encriptada
-                "perfil" => $perfil,
-                "nombre" => $_POST["nuevoNombre"],
-                "apellido" => $_POST["nuevoApellido"],
-                "cedula" => $_POST["nuevoCedula"],
-                "direccion" => $_POST["nuevaDireccion"], // Campo dirección
-                "telefono" => $_POST["nuevoTelefono"], // Campo teléfono
-                "foto" => $ruta,
-                "estado" => $estado,
-                "idSucursal" => $_POST["nuevaSucursal"],
-                "token" => null  // Inicialmente nulo
-            );
+                $datos = array(
+                    "usuario" => $_POST["nuevoUsuario"],
+                    "password" => $passwordEncriptado, // Guardar la contraseña encriptada
+                    "perfil" => $perfil,
+                    "nombre" => $_POST["nuevoNombre"],
+                    "apellido" => $_POST["nuevoApellido"],
+                    "cedula" => $_POST["nuevoCedula"],
+                    "direccion" => $_POST["nuevaDireccion"], // Campo dirección
+                    "telefono" => $_POST["nuevoTelefono"], // Campo teléfono
+                    "foto" => $ruta,
+                    "estado" => $estado,
+                    "idSucursal" => $_POST["nuevaSucursal"],
+                    "token" => null  // Inicialmente nulo
+                );
 
-            $respuesta = ModeloUsuarios::mdlIngresarUsuario($tabla, $datos);
+                $respuesta = ModeloUsuarios::mdlIngresarUsuario($tabla, $datos);
 
-            if ($respuesta == "ok") {
-                // Obtener el ID del usuario recién creado
-                $idUsuario = ModeloUsuarios::mdlObtenerUltimoId($tabla);
+                if ($respuesta == "ok") {
+                    // Obtener el ID del usuario recién creado
+                    $idUsuario = ModeloUsuarios::mdlObtenerUltimoId($tabla);
 
-                // Si el perfil es 5 (Empresa), generamos un token con el ID del usuario
-                if ($perfil == 5) {
-                    $payload = [
-                        'iss' => "http://localhost/Proyecto-web-Encomiendas",
-                        'aud' => "http://localhost/Proyecto-web-Encomiendas",
-                        'iat' => time(),
-                        'nbf' => time(),
-                        'data' => [
-                            'idUsuario' => $idUsuario,
-                            'usuario' => $datos["usuario"],
-                            'perfil' => 'empresa',
-                        ]
-                    ];
+                    // Si el perfil es 5 (Empresa), generamos un token con el ID del usuario
+                    if ($perfil == 5) {
+                        $payload = [
+                            'iss' => "http://localhost/Proyecto-web-Encomiendas",
+                            'aud' => "http://localhost/Proyecto-web-Encomiendas",
+                            'iat' => time(),
+                            'nbf' => time(),
+                            'data' => [
+                                'idUsuario' => $idUsuario,
+                                'usuario' => $datos["usuario"],
+                                'perfil' => 'empresa',
+                            ]
+                        ];
 
-                    $token = JWT::encode($payload, $this->key, 'HS256');
+                        $token = JWT::encode($payload, $this->key, 'HS256');
 
-                    // Actualizar el usuario con el token generado
-                    ModeloUsuarios::mdlActualizarToken($idUsuario, $token);
-                }
+                        // Actualizar el usuario con el token generado
+                        ModeloUsuarios::mdlActualizarToken($idUsuario, $token);
+                    }
 
-                echo "<script>
+                    echo "<script>
                 window.addEventListener('load', function() {
                     toastr.success('El usuario ha sido guardado correctamente', '¡Éxito!');
                     setTimeout(function() {
@@ -176,8 +174,8 @@ class ControladorUsuarios
                     }, 2000);
                 });
                 </script>";
-            } else {
-                echo "<script>
+                } else {
+                    echo "<script>
                 window.addEventListener('load', function() {
                     toastr.error('No se pudo registrar el usuario.', 'Error');
                     setTimeout(function() {
@@ -185,10 +183,10 @@ class ControladorUsuarios
                     }, 2000);
                 });
                 </script>";
+                }
             }
         }
     }
-}
 
 
 
@@ -390,7 +388,4 @@ class ControladorUsuarios
             }
         }
     }
-    
 }
-
-

@@ -35,76 +35,36 @@ session_start();
 
 
   <!-- Core Css -->
-  <link id="themeColors" rel="stylesheet" href="vistas/dist/css/style.min.css" />
+  <link id="themeColors" rel="stylesheet" href="vistas/dist/css/style.css" />
 
   <script src="vistas/dist/js/plugins/toastr-init.js"></script>
 
+  <style>
+    .input-group {
+      margin-bottom: 20px;
+    }
 
+    .dataTables_filter {
+      display: none;
+      /* Oculta el cuadro de búsqueda predeterminado de DataTables */
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+
+    }
+  </style>
 </head>
-<style>
-  .dataTables_wrapper .dataTables_length,
-  .dataTables_wrapper .dataTables_filter {}
-
-  .dataTables_wrapper .dataTables_length {
-    margin-right: auto;
-  }
-
-  .dataTables_wrapper .dataTables_filter {
-    margin-left: auto;
-  }
-
-  .dataTables_wrapper .dataTables_filter input {
-    border-radius: 4px;
-    padding: 5px 10px;
-    font-size: 14px;
-  }
-
-  .dataTables_wrapper .dataTables_length select {
-    border-radius: 4px;
-    padding: 5px 10px;
-    font-size: 14px;
-  }
-
-  table.dataTable.no-footer {
-    border-bottom: none;
-  }
-
-  table.dataTable thead th,
-  table.dataTable tbody td {
-    border: none;
-    padding: 11px;
-    font-size: 13px;
-  }
-
-  table.dataTable.stripe tbody tr.odd,
-  table.dataTable.display tbody tr.odd {
-    background-color: #f9f9f9;
-  }
-
-  table.dataTable.stripe tbody tr.even,
-  table.dataTable.display tbody tr.even {
-    background-color: #fff;
-  }
-
-  table.dataTable.hover tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-</style>
 
 <body>
   <?php
-  echo '<div 
-class="page-wrapper"
-id="main-wrapper"
-data-layout="vertical"
-data-navbarbg="skin6"
-data-sidebartype="full"
-data-sidebar-position="fixed"
-data-header-position="fixed"
->';
+
+  echo '<div class="page-wrapper" id="main-wrapper" data-theme="blue_theme"  data-layout="vertical" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+';
 
   if (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") {
 
+    echo '';
     // Verificar el perfil del usuario
     if (isset($_SESSION['perfil']) && $_SESSION['perfil'] == 5) {
 
@@ -126,6 +86,7 @@ data-header-position="fixed"
           $_GET["ruta"] == "pagoexitoso" ||
           $_GET["ruta"] == "cliente" ||
           $_GET["ruta"] == "sucursal" ||
+          $_GET["ruta"] == "categoria" ||
           $_GET["ruta"] == "reportesx" ||
           $_GET["ruta"] == "ajustes" ||
           $_GET["ruta"] == "logout"
@@ -167,6 +128,8 @@ data-header-position="fixed"
           $_GET["ruta"] == "pagoexitoso" ||
           $_GET["ruta"] == "cliente" ||
           $_GET["ruta"] == "sucursal" ||
+          $_GET["ruta"] == "categoria" ||
+          $_GET["ruta"] == "pagos" ||
           $_GET["ruta"] == "reportesx" ||
           $_GET["ruta"] == "usuarios" ||
           $_GET["ruta"] == "envios_empresa" ||
@@ -191,80 +154,65 @@ data-header-position="fixed"
 
 
 
-
-
-  <!--  Customizer -->
   <!--  Import Js Files -->
-
-
-  <!--  core files -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <!--  current page js files -->
-  <script src="vistas/dist/libs/moment-js/build/moment.min.js"></script>
-  <script src="vistas/dist/libs/owl.carousel/dist/owl.carousel.min.js"></script>
-
-
   <script src="vistas/dist/libs/jquery/dist/jquery.min.js"></script>
+
+  <script src="vistas/dist/js/dashboard.js"></script>
+
+
+
+  <!-- Moment.js -->
+  <script src="vistas/dist/libs/moment-js/build/moment.min.js"></script>
+
+  <!-- Owl Carousel -->
+  <script src="vistas/dist/libs/owl.carousel/dist/owl.carousel.min.js"></script>
+  <script src="vistas/dist/libs/owl.carousel/dist/owl.carousel.min.js"></script>
+  <script src="vistas/dist/libs/apexcharts/dist/apexcharts.min.js"></script>
+
+
+  <!-- SimpleBar -->
   <script src="vistas/dist/libs/simplebar/dist/simplebar.min.js"></script>
+
+  <!-- Bootstrap Bundle -->
   <script src="vistas/dist/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- PrismJS (for code highlighting) -->
   <script src="vistas/dist/libs/prismjs/prism.js"></script>
 
-  <script src="dist/libs/jquery/dist/jquery.min.js"></script>
-  <script src="dist/libs/simplebar/dist/simplebar.min.js"></script>
-  <script src="dist/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- ---------------------------------------------- -->
-  <!-- core files -->
-  <!-- ---------------------------------------------- -->
-  <script src="dist/js/app.min.js"></script>
-  <script src="dist/js/app.init.js"></script>
-  <script src="dist/js/app-style-switcher.js"></script>
-  <script src="dist/js/sidebarmenu.js"></script>
-
-  <script src="dist/js/custom.js"></script>
-  <!-- ---------------------------------------------- -->
-  <!-- current page js files -->
-  <!-- ---------------------------------------------- -->
-  <script src="dist/js/apps/contact.js"></script>
-  <!-- ---------------------------------------------- -->
-  <!-- core files -->
-  <!-- ---------------------------------------------- -->
+  <!-- Core JS Files -->
   <script src="vistas/dist/js/app.min.js"></script>
-  <script src="vistas/dist/js/app.minisidebar.init.js"></script>
+  <script src="vistas/dist/js/app.init.js"></script>
   <script src="vistas/dist/js/app-style-switcher.js"></script>
   <script src="vistas/dist/js/sidebarmenu.js"></script>
-  <script src="vistas/dist/js/apps/contact.js"></script>
+
+  <!-- Custom JS -->
   <script src="vistas/dist/js/custom.js"></script>
 
-  <!-- ---------------------------------------------- -->
-  <!-- current page js files -->
-  <!-- ---------------------------------------------- -->
+  <!-- Contact JS -->
   <script src="vistas/dist/js/apps/contact.js"></script>
+
+  <!-- Form Wizard and Validation -->
   <script src="vistas/dist/libs/jquery-steps/build/jquery.steps.min.js"></script>
   <script src="vistas/dist/libs/jquery-validation/dist/jquery.validate.min.js"></script>
   <script src="vistas/dist/js/forms/form-wizard.js"></script>
-  <script src="vistas/dist/libs/datatables.net/js/jquery.dataTables.min.js"></script>
 
+  <!-- DataTables -->
+  <script src="vistas/dist/libs/datatables.net/js/jquery.dataTables.min.js"></script>
   <script src="vistas/dist/js/datatable/datatable-basic.init.js"></script>
-  <!-- DataTables JS -->
-  <script src="vistas/dist/libs/sweetalert2/dist/sweetalert2.min.js"></script>
+
+  <!-- Sweet Alert -->
   <script src="vistas/dist/js/forms/sweet-alert.init.js"></script>
 
-
+  <!-- Dashboard and Toastr Init -->
   <script src="vistas/dist/js/dashboard.js"></script>
   <script src="vistas/dist/js/plugins/toastr-init.js"></script>
 
+  <!-- Custom Scripts per page -->
   <script src="vistas/js/plantilla.js"></script>
   <script src="vistas/js/sucursal.js"></script>
-
   <script src="vistas/js/cliente.js"></script>
   <script src="vistas/js/usuarios.js"></script>
   <script src="vistas/js/paquetes.js"></script>
-
-
 
 
 

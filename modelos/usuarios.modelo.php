@@ -122,27 +122,27 @@ CREAR USUARIO
         $stmt = null;
     }
     public static function mdlEditarEmpresa($tabla, $datos)
-{
-    $stmt = Conexion::conectar()->prepare("UPDATE $tabla SET nombre = :nombre, cedula = :cedula, direccion = :direccion, telefono = :telefono, password = :password, foto = :foto, usuario = :usuario, perfil = 5 WHERE id = :id");
+    {
+        $stmt = Conexion::conectar()->prepare("UPDATE $tabla SET nombre = :nombre, cedula = :cedula, direccion = :direccion, telefono = :telefono, password = :password, foto = :foto, usuario = :usuario, perfil = 5 WHERE id = :id");
 
-    $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
-    $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
-    $stmt->bindParam(":cedula", $datos["cedula"], PDO::PARAM_STR);
-    $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
-    $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
-    $stmt->bindParam(":usuario", $datos["usuario"], PDO::PARAM_STR);
-    $stmt->bindParam(":password", $datos["password"], PDO::PARAM_STR);
-    $stmt->bindParam(":foto", $datos["foto"], PDO::PARAM_STR);
+        $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
+        $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
+        $stmt->bindParam(":cedula", $datos["cedula"], PDO::PARAM_STR);
+        $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
+        $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
+        $stmt->bindParam(":usuario", $datos["usuario"], PDO::PARAM_STR);
+        $stmt->bindParam(":password", $datos["password"], PDO::PARAM_STR);
+        $stmt->bindParam(":foto", $datos["foto"], PDO::PARAM_STR);
 
-    if ($stmt->execute()) {
-        return "ok";
-    } else {
-        return "error";
+        if ($stmt->execute()) {
+            return "ok";
+        } else {
+            return "error";
+        }
+
+        $stmt->close();
+        $stmt = null;
     }
-
-    $stmt->close();
-    $stmt = null;
-}
 
 
 

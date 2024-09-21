@@ -87,7 +87,7 @@ $("#scroll_ver_dynamic_hei").DataTable({
  *     horizontal scroll Table    *
  ****************************************/
 $("#scroll_hor").DataTable({
-  scrollX: true,
+  
 });
 
 /****************************************
