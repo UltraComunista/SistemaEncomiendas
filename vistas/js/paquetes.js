@@ -1,71 +1,96 @@
 $(document).ready(function () {
-
   console.log("Script cargado correctamente");
 
   const preciosPorPeso = [
-      { rango: [0.01, 1], precio: 35.00 },
-      { rango: [1.01, 2], precio: 60.00 },
-      { rango: [2.01, 3], precio: 70.00 },
-      { rango: [3.01, 4], precio: 80.00 },
-      { rango: [4.01, 5], precio: 90.00 },
-      { rango: [5.01, 6], precio: 110.00 },
-      { rango: [6.01, 7], precio: 110.00 },
-      { rango: [7.01, 8], precio: 120.00 },
-      { rango: [8.01, 9], precio: 130.00 },
-      { rango: [9.01, 10], precio: 140.00 },
-      { rango: [10.01, 12], precio: 160.00 },
-      { rango: [12.01, 15], precio: 190.00 },
-      { rango: [15.01, 20], precio: 240.00 },
+    { rango: [0.01, 1], precio: 10.00 },
+    { rango: [1.01, 2], precio: 35.00 },
+    { rango: [2.01, 3], precio: 50.00 },
+    { rango: [3.01, 4], precio: 60.00 },
+    { rango: [4.01, 5], precio: 70.00 },
+    { rango: [5.01, 6], precio: 80.00 },
+    { rango: [6.01, 7], precio: 90.00 },
+    { rango: [7.01, 8], precio: 100.00 },
+    { rango: [8.01, 9], precio: 110.00 },
+    { rango: [9.01, 10], precio: 115.00 },
+    { rango: [10.01, 12], precio: 120.00 },
+    { rango: [12.01, 15], precio: 135.00 },
+    { rango: [15.01, 20], precio: 140.00 },
   ];
 
-  const preciosPorTipo = {
-      1: 15.00, // Electrónico
-      2: 10.00, // Indumentaria
-      3: 30.00, // Juguetes
-      4: 40.00, // Mercaderia
-  };
-
+  // Referencias a los elementos del formulario
   const pesoInput = $('#pesoPaquete');
   const precioInput = $('#precio');
   const tipoPaqueteSelect = $('#tipoPaquete');
 
+  // Precio base por categoría, será actualizado vía AJAX
+  let precioBaseCategoria = 0;
+
   function obtenerPrecioPorPeso(peso) {
-      for (let i = 0; i < preciosPorPeso.length; i++) {
-          const rango = preciosPorPeso[i].rango;
-          if (peso >= rango[0] && peso <= rango[1]) {
-              return preciosPorPeso[i].precio;
-          }
+    for (let i = 0; i < preciosPorPeso.length; i++) {
+      const rango = preciosPorPeso[i].rango;
+      if (peso >= rango[0] && peso <= rango[1]) {
+        return preciosPorPeso[i].precio;
       }
-      return 0; // Retorna 0 si no se encuentra un rango adecuado
+    }
+    return 0; // Retorna 0 si no se encuentra un rango adecuado
   }
 
+  // Función para actualizar el precio total
   function actualizarPrecio() {
-      console.log("Evento de actualización de precio disparado");
 
-      const peso = parseFloat(pesoInput.val()) || 0;
-      const tipoPaquete = parseInt(tipoPaqueteSelect.val()) || 0;
-      let precio = 0;
+    const peso = parseFloat(pesoInput.val()) || 0;
+    let precioFinal = 0;
 
-      console.log(`Peso seleccionado: ${peso}`);
-      console.log(`Tipo de paquete seleccionado: ${tipoPaquete}`);
+    // Obtener precio basado en el peso
+    precioFinal += obtenerPrecioPorPeso(peso);
 
-      // Obtener precio basado en el peso
-      precio += obtenerPrecioPorPeso(peso);
+    // Sumar el precio base de la categoría (obtenido vía AJAX)
+    precioFinal += precioBaseCategoria;
 
-      // Sumar el precio adicional basado en el tipo de paquete
-      if (preciosPorTipo.hasOwnProperty(tipoPaquete)) {
-          precio += preciosPorTipo[tipoPaquete];
-          console.log(`Precio basado en el tipo: ${preciosPorTipo[tipoPaquete]}`);
-      }
-
-      console.log(`Precio total calculado: ${precio}`);
-      precioInput.val(precio.toFixed(2));
+    // Mostrar el precio total en el input
+    precioInput.val(precioFinal.toFixed(2));
   }
 
-  pesoInput.on('input', actualizarPrecio);
-  tipoPaqueteSelect.on('change', actualizarPrecio);
-});
+  // Función para obtener el precio de la categoría vía AJAX usando jQuery
+  function obtenerPrecioPorCategoria(idCategoria) {
+    if (idCategoria) {
+      console.log(`Obteniendo precio de la categoría con id: ${idCategoria}`);
 
+      // Realizamos la llamada AJAX
+      $.ajax({
+        type: 'POST',
+        url: 'ajax/categoria.ajax.php',
+        data: { idCategoria: idCategoria },
+        dataType: 'json',
+        success: function (respuesta) {
+          if (respuesta && respuesta.precio) {
+            precioBaseCategoria = parseFloat(respuesta.precio);
+            console.log(`Precio base de la categoría actualizado a: ${precioBaseCategoria}`);
+            actualizarPrecio();
+          } else {
+            console.log("Error: No se obtuvo el precio de la categoría.");
+            precioBaseCategoria = 0;
+            actualizarPrecio();
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("Error en la solicitud AJAX: ", error);
+        }
+      });
+    } else {
+      precioBaseCategoria = 0;
+      actualizarPrecio();
+    }
+  }
+
+  // Eventos de cambio y entrada de datos
+  pesoInput.on('input', actualizarPrecio); // Actualiza el precio cuando se cambia el peso
+  tipoPaqueteSelect.on('change', function () {
+    var idCategoria = $(this).val();
+    obtenerPrecioPorCategoria(idCategoria); // Obtener el precio por categoría cuando cambia la selección
+  });
+
+});
 
 
 

@@ -32,6 +32,7 @@ session_start();
   <!-- Datatable -->
   <!-- --------------------------------------------------- -->
   <link rel="stylesheet" href="vistas/dist/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+  <script src="vistas/dist/libs/jquery/dist/jquery.min.js"></script>
 
 
   <!-- Core Css -->
@@ -154,8 +155,9 @@ session_start();
 
 
 
+  <script src="vistas/dist/js/apps/contact.js"></script>
+
   <!--  Import Js Files -->
-  <script src="vistas/dist/libs/jquery/dist/jquery.min.js"></script>
 
   <script src="vistas/dist/js/dashboard.js"></script>
 
@@ -165,7 +167,6 @@ session_start();
   <script src="vistas/dist/libs/moment-js/build/moment.min.js"></script>
 
   <!-- Owl Carousel -->
-  <script src="vistas/dist/libs/owl.carousel/dist/owl.carousel.min.js"></script>
   <script src="vistas/dist/libs/owl.carousel/dist/owl.carousel.min.js"></script>
   <script src="vistas/dist/libs/apexcharts/dist/apexcharts.min.js"></script>
 
@@ -207,12 +208,15 @@ session_start();
   <script src="vistas/dist/js/dashboard.js"></script>
   <script src="vistas/dist/js/plugins/toastr-init.js"></script>
 
+
   <!-- Custom Scripts per page -->
   <script src="vistas/js/plantilla.js"></script>
   <script src="vistas/js/sucursal.js"></script>
   <script src="vistas/js/cliente.js"></script>
   <script src="vistas/js/usuarios.js"></script>
   <script src="vistas/js/paquetes.js"></script>
+  <script src="vistas/js/categoria.js"></script>
+
 
 
 

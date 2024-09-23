@@ -1,34 +1,4 @@
-<?php
-if (isset($_GET['pagado'])) {
-  $pagado = $_GET['pagado'];
-  if ($pagado === 'success') {
-    echo "<script>
-            Swal.fire({
-                title: '¡Pago Completado!',
-                text: 'El pago fue realizado con éxito.',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                window.location.href = 'listaenvios'; // Redirige a la página principal sin parámetros
-            });
-        </script>";
-  } elseif ($pagado === 'error') {
-    echo "<script>
-            Swal.fire({
-                title: 'Error',
-                text: 'Hubo un problema con el pago.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                window.location.href = 'listaenvios'; // Redirige a la página principal sin parámetros
-            });
-        </script>";
-  }
-}
-?>
-
 <div class="container-fluid mw-100">
-
   <h3 class="text-center"><strong>Registrar envios</strong></h3>
   <h5 class="text-center">Encomiendas</h5>
   <div class="col-12">
@@ -186,7 +156,7 @@ if (isset($_GET['pagado'])) {
                       </div>
                       <div class="mb-3">
                         <label for="sucursalLlegada">Sucursal de Llegada:</label>
-                        
+
                         <select class="form-select" id="sucursalLlegada" name="sucursalLlegada">
                           <!-- Sucursales se llenarán dinámicamente -->
                         </select>
@@ -207,16 +177,7 @@ if (isset($_GET['pagado'])) {
                     </div>
 
                   </div>
-
-
-
-
-
-
-
                 </section>
-
-                <!-- Detalles del Paquete -->
                 <!-- Detalles del Paquete -->
                 <h6>Detalles</h6>
                 <section>
@@ -234,11 +195,13 @@ if (isset($_GET['pagado'])) {
                         <label for="tipoPaquete">Tipo:</label>
                         <select class="form-select" id="tipoPaquete" name="tipoPaquete" required>
                           <option value="">Selecciona...</option>
-                          <option value="1">Electrónico</option>
-                          <option value="2">Indumentaria</option>
-                          <option value="3">Juguetes</option>
-                          <option value="4">Mercadería</option>
-                          <option value="5">Otros</option>
+                          <?php
+                          // Aquí generamos las opciones dinámicamente desde la base de datos
+                          $categorias = ControladorCategoria::ctrMostrarCategorias(null, null);
+                          foreach ($categorias as $categoria) {
+                            echo '<option value="' . $categoria["id"] . '">' . $categoria["nombre"] . '</option>';
+                          }
+                          ?>
                         </select>
                       </div>
                     </div>
@@ -254,6 +217,9 @@ if (isset($_GET['pagado'])) {
                     </div>
                   </div>
                 </section>
+
+               
+
 
 
               </form>
@@ -280,114 +246,112 @@ if (isset($_GET['pagado'])) {
                 </div>
                 <!-- /.modal-dialog -->
               </div>
-
-
-
-
             </div>
           </div>
         </div>
         <div class="col-8">
-          <div class="card">
-            <div class="card-body">
-              <div class="mb-2">
-                <h6 class="">Envios hoy</h6>
-              </div>
-              <div class="table-responsive">
-                <table id="scroll_hor" class="table border table-striped table-bordered display nowrap">
-                  <thead>
-                    <!-- start row -->
-                    <tr>
-                      <th class="text-center">Numero rastreo</th>
-                      <th class="text-center">Destinatario</th>
-                      <th class="text-center">Sucursal</th>
-                      <th class="text-center">Estado Envio</th>
-                      <th class="text-center">Estado Pago</th>
-                      <th class="text-center">Precio</th>
-                      <th class="text-center">Tipo</th>
-                      <th class="text-center">Detalle</th>
-                      <th class="text-center">Acciones</th>
-                    </tr>
-                    <!-- end row -->
-                  </thead>
-                  <tbody>
-                    <?php
-                    $item = null;
-                    $valor = null;
-                    $paquetes = ControladorPaquetes::ctrMostrarPaquetes($item, $valor);
-                    foreach ($paquetes as $key => $value) {
-                      // Estado de Pago
-                      $estadoPago = $value["EstadoPago"] == 1 ? '<span class="mb-1 badge rounded-pill text-bg-success">Pagado</span>' : '<span class="mb-1 badge rounded-pill text-bg-danger">Debe</span>';
+          <section class="datatables">
+            <div class="card">
+              <div class="card-body">
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Buscar envíos..." id="buscarEnvios">
+                      <button class="btn btn-outline-secondary" type="button">
+                        <i class="ti ti-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <button class="btn btn-secondary me-2">
+                      <i class="ti ti-filter me-1"></i> Filtrar
+                    </button>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover tablas" style="width: 100%">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Número de Rastreo</th>
+                        <th class="text-center">Destinatario</th>
+                        <th class="text-center">Sucursal Salida</th>
+                        <th class="text-center">Estado Envío</th>
+                        <th class="text-center">Estado Pago</th>
+                        <th class="text-center">Precio</th>
+                        <th class="text-center">Tipo</th>
+                        <th class="text-center">Detalle</th>
+                        <th class="text-center">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php
+                      $item = null;
+                      $valor = null;
+                      $paquetes = ControladorPaquetes::ctrMostrarPaquetes($item, $valor);
 
-                      // Estado del Paquete
-                      switch ($value["estadoPaquete"]) {
-                        case 0:
-                          $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-warning">Recepcionado</span>';
-                          break;
-                        case 1:
-                          $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-primary">En camino</span>';
-                          break;
-                        case 2:
-                          $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-info">Recepcionado</span>';
-                          break;
-                        case 3:
-                          $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-success">Entregado</span>';
-                          break;
-                        default:
-                          $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-secondary">Desconocido</span>';
-                          break;
+                      foreach ($paquetes as $key => $value) {
+                        // Estado de Pago
+                        $estadoPago = $value["estadoPago"] == 1 ? '<span class="mb-1 badge rounded-pill text-bg-success">Pagado</span>' : '<span class="mb-1 badge rounded-pill text-bg-danger">Debe</span>';
+
+                        // Estado del Paquete
+                        switch ($value["estadoPaquete"]) {
+                          case 0:
+                            $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-warning">Recepcionado</span>';
+                            break;
+                          case 1:
+                            $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-primary">En camino</span>';
+                            break;
+                          case 2:
+                            $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-info">Recepcionado en destino</span>';
+                            break;
+                          case 3:
+                            $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-success">Entregado</span>';
+                            break;
+                          default:
+                            $estadoPaquete = '<span class="mb-1 badge rounded-pill text-bg-secondary">Desconocido</span>';
+                            break;
+                        }
+
+                        // Tipo de Paquete
+                        $tipoPaquete = !empty($value["tipo_paquete"]) ? $value["tipo_paquete"] : 'Desconocido';
+
+                        echo '<tr>';
+                        echo '<td class="text-center">' . $value["nro_registro"] . '</td>';
+                        echo '<td class="text-center">' . $value["nombre_destinatario"] . '</td>';
+                        echo '<td class="text-center">' . (isset($value["nombre_sucursal_salida"]) ? $value["nombre_sucursal_salida"] : 'Desconocido') . '</td>';
+                        echo '<td class="text-center">' . $estadoPaquete . '</td>';
+                        echo '<td class="text-center">' . $estadoPago . '</td>';
+                        echo '<td class="text-center">' . number_format($value["precio"], 2) . '</td>';
+                        echo '<td class="text-center">' . $tipoPaquete . '</td>';
+                        echo '<td class="text-center">' . $value["descripcion"] . '</td>';
+                        echo '<td class="text-center">
+                <div class="dropdown dropstart">
+                    <a href="#" class="text-muted" id="dropdownMenuButton' . $value["id"] . '" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ti ti-dots fs-5"></i>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $value["id"] . '">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-3 btnEditarPaquete" idPaquete="' . $value["id"] . '" href="#" data-bs-toggle="modal" data-bs-target="#bs-example-modal-xlg">
+                                <i class="fs-4 ti ti-pencil"></i>Editar
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-3" href="reportes/guia_envio.php?idPaquete=' . $value["id"] . '" target="_blank">
+                                <i class="fs-4 ti ti-printer"></i>Imprimir
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </td>';
+                        echo '</tr>';
                       }
-
-
-                      // Tipo de Paquete
-                      $tiposPaquete = [
-                        1 => 'Electrónico',
-                        2 => 'Indumentaria',
-                        3 => 'Juguetes',
-                        4 => 'Mercadería',
-                        5 => 'Otros'
-                      ];
-                      $tipoPaquete = isset($value["tipo_paquete"]) && isset($tiposPaquete[$value["tipo_paquete"]]) ? $tiposPaquete[$value["tipo_paquete"]] : 'Desconocido';
-
-                      echo '<tr>';
-                      echo '<td>' . $value["nro_registro"] . '</td>';
-                      echo '<td>' . $value["nombre_destinatario"] . '</td>';
-                      echo '<td>' . (isset($value["nombre_sucursal_salida"]) ? $value["nombre_sucursal_salida"] : 'Desconocido') . '</td>';
-                      echo '<td>' . $estadoPaquete . '</td>';
-                      echo '<td>' . $estadoPago . '</td>';
-                      echo '<td>' . $value["precio"] . '</td>';
-                      echo '<td>' . $tipoPaquete . '</td>';
-                      echo '<td>' . $value["descripcion"] . '</td>';
-                      echo '<td>
-        <div class="dropdown dropstart">
-            <a href="#" class="text-muted" id="dropdownMenuButton' . $value["id"] . '" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="ti ti-dots fs-5"></i>
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $value["id"] . '">
-                <li>
-                    <a class="dropdown-item d-flex align-items-center gap-3 btnEditarPaquete" idPaquete="' . $value["id"] . '" href="#" data-bs-toggle="modal" data-bs-target="#bs-example-modal-xlg">
-                        <i class="fs-4 ti ti-edit"></i>Editar
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item d-flex align-items-center gap-3" href="reportes/guia_envio.php?idPaquete=' . $value["id"] . '" target="_blank">
-                        <i class="fs-4 ti ti-printer"></i>Imprimir
-                    </a>
-                </li>
-            </ul>
-        </div>
-        </td>';
-                      echo '</tr>';
-                    }
-                    ?>
-                  </tbody>
-
-
-
-                </table>
+                      ?>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-          </div>
+          </section>
           <!-- ---------------------
                                     end Scroll - Horizontal
                                 ---------------- -->

@@ -20,7 +20,7 @@ class ModeloPaquetes
                 INNER JOIN cliente cr ON rp.idclienteR = cr.id
                 INNER JOIN sucursal cs ON rp.idSucursalE = cs.id
                 INNER JOIN sucursal cs2 ON rp.idSucursalR = cs2.id
-                INNER JOIN detallePaquete dp ON rp.idDetalle = dp.id
+                INNER JOIN detelleEncomienda dp ON rp.idDetalle = dp.id
                 INNER JOIN usuario u ON rp.idUsuario = u.id -- Unión con la tabla de usuarios para obtener el nombre del usuario
                 WHERE rp.idUsuario = :idUsuario
             ");
@@ -214,8 +214,8 @@ class ModeloPaquetes
                 $idClienteR = $db->lastInsertId(); // Corrección aquí
             }
 
-            // Insertar datos en la tabla detallepaquete, incluyendo el peso
-            $stmt = $db->prepare("INSERT INTO detallePaquete (descripcion, cantidad, precio, tipo, peso) VALUES (:descripcion, :cantidad, :precio, :tipo, :peso)");
+            // Insertar datos en la tabla detelleEncomienda, incluyendo el peso
+            $stmt = $db->prepare("INSERT INTO detelleEncomienda (descripcion, cantidad, precio, tipo, peso) VALUES (:descripcion, :cantidad, :precio, :tipo, :peso)");
             $stmt->bindParam(":descripcion", $datos["descripcion"], PDO::PARAM_STR);
             $stmt->bindParam(":cantidad", $datos["cantidad"], PDO::PARAM_INT);
             $stmt->bindParam(":precio", $datos["precio"], PDO::PARAM_STR);
@@ -357,8 +357,8 @@ class ModeloPaquetes
                 error_log("Nuevo cliente receptor creado. ID: " . $idClienteR . "\n");
             }
 
-            // Insertar datos en la tabla detallepaquete
-            $stmt = $db->prepare("INSERT INTO detallePaquete (descripcion, cantidad, precio, tipo, peso) VALUES (:descripcion, :cantidad, :precio, :tipo, :peso)");
+            // Insertar datos en la tabla detelleEncomienda
+            $stmt = $db->prepare("INSERT INTO detelleEncomienda (descripcion, cantidad, precio, tipo, peso) VALUES (:descripcion, :cantidad, :precio, :tipo, :peso)");
             $stmt->bindParam(":descripcion", $datos["descripcion"], PDO::PARAM_STR);
             $stmt->bindParam(":cantidad", $datos["cantidad"], PDO::PARAM_INT);
             $stmt->bindParam(":precio", $datos["precio"], PDO::PARAM_STR);
@@ -499,49 +499,64 @@ class ModeloPaquetes
         try {
             if ($item != null) {
                 $stmt = Conexion::conectar()->prepare("
-            SELECT rp.*, 
-                   ce.nombre AS nombre_enviador, ce.cedula AS cedula_enviador, ce.telefono AS telefono_enviador, ce.direccion AS direccion_enviador,
-                   cr.nombre AS nombre_destinatario, cr.cedula AS cedula_destinatario, cr.telefono AS telefono_destinatario, cr.direccion AS direccion_destinatario,
-                   cs.nombre AS nombre_sucursal_salida, cs.direccion AS direccion_sucursal_salida,
-                   cs2.nombre AS nombre_sucursal_llegada, cs2.direccion AS direccion_sucursal_llegada,
-                   dp.descripcion, dp.cantidad, dp.precio, dp.tipo AS tipo_paquete,
-                   u.usuario AS nombre_usuario_registro -- Aquí se agrega el nombre del usuario que registró el envío
-            FROM $tabla rp
-            INNER JOIN cliente ce ON rp.idclienteE = ce.id
-            INNER JOIN cliente cr ON rp.idclienteR = cr.id
-            INNER JOIN sucursal cs ON rp.idSucursalE = cs.id
-            INNER JOIN sucursal cs2 ON rp.idSucursalR = cs2.id
-            INNER JOIN detallePaquete dp ON rp.idDetalle = dp.id
-            INNER JOIN usuario u ON rp.idUsuario = u.id -- Unión con la tabla de usuarios para obtener el nombre del usuario
-            WHERE rp.$item = :$item
-        ");
+                SELECT rp.*, 
+                       ce.nombre AS nombre_enviador, ce.cedula AS cedula_enviador, ce.telefono AS telefono_enviador, ce.direccion AS direccion_enviador,
+                       cr.nombre AS nombre_destinatario, cr.cedula AS cedula_destinatario, cr.telefono AS telefono_destinatario, cr.direccion AS direccion_destinatario,
+                       cs.nombre AS nombre_sucursal_salida, cs.direccion AS direccion_sucursal_salida,
+                       cs2.nombre AS nombre_sucursal_llegada, cs2.direccion AS direccion_sucursal_llegada,
+                       dp.descripcion, dp.cantidad, dp.peso,
+                       c.nombre AS tipo_paquete, -- Obtenemos el nombre de la categoría (tipo de paquete)
+                       c.precio,
+                       u.usuario AS nombre_usuario_registro,
+                       p.estadoPago
+                FROM $tabla rp
+                INNER JOIN cliente ce ON rp.idClienteE = ce.id
+                INNER JOIN cliente cr ON rp.idClienteR = cr.id
+                INNER JOIN sucursal cs ON rp.idSucursalE = cs.id
+                INNER JOIN sucursal cs2 ON rp.idSucursalR = cs2.id
+                INNER JOIN detalleEncomienda dp ON rp.idDetalle = dp.id
+                INNER JOIN categoria c ON dp.idCategoria = c.id -- JOIN con la tabla de categorías para obtener el tipo y precio
+                INNER JOIN usuario u ON rp.idUsuario = u.id
+                LEFT JOIN pagos p ON rp.idPagos = p.id -- JOIN con la tabla de pagos para obtener el estado del pago
+                WHERE rp.$item = :$item
+            ");
                 $stmt->bindParam(":" . $item, $valor, PDO::PARAM_STR);
                 $stmt->execute();
-                return $stmt->fetch();
+                return $stmt->fetch(PDO::FETCH_ASSOC); // Devolver solo una fila
             } else {
                 $stmt = Conexion::conectar()->prepare("
-            SELECT rp.*, 
-                   ce.nombre AS nombre_enviador, ce.cedula AS cedula_enviador, ce.telefono AS telefono_enviador, ce.direccion AS direccion_enviador,
-                   cr.nombre AS nombre_destinatario, cr.cedula AS cedula_destinatario, cr.telefono AS telefono_destinatario, cr.direccion AS direccion_destinatario,
-                   cs.nombre AS nombre_sucursal_salida, cs.direccion AS direccion_sucursal_salida,
-                   cs2.nombre AS nombre_sucursal_llegada, cs2.direccion AS direccion_sucursal_llegada,
-                   dp.descripcion, dp.cantidad, dp.precio, dp.tipo AS tipo_paquete,
-                   u.usuario AS nombre_usuario_registro -- Aquí se agrega el nombre del usuario que registró el envío
-            FROM $tabla rp
-            INNER JOIN cliente ce ON rp.idclienteE = ce.id
-            INNER JOIN cliente cr ON rp.idclienteR = cr.id
-            INNER JOIN sucursal cs ON rp.idSucursalE = cs.id
-            INNER JOIN sucursal cs2 ON rp.idSucursalR = cs2.id
-            INNER JOIN detallePaquete dp ON rp.idDetalle = dp.id
-            INNER JOIN usuario u ON rp.idUsuario = u.id -- Unión con la tabla de usuarios para obtener el nombre del usuario
-        ");
+                SELECT rp.*, 
+                       ce.nombre AS nombre_enviador, ce.cedula AS cedula_enviador, ce.telefono AS telefono_enviador, ce.direccion AS direccion_enviador,
+                       cr.nombre AS nombre_destinatario, cr.cedula AS cedula_destinatario, cr.telefono AS telefono_destinatario, cr.direccion AS direccion_destinatario,
+                       cs.nombre AS nombre_sucursal_salida, cs.direccion AS direccion_sucursal_salida,
+                       cs2.nombre AS nombre_sucursal_llegada, cs2.direccion AS direccion_sucursal_llegada,
+                       dp.descripcion, dp.cantidad, dp.peso,
+                       c.nombre AS tipo_paquete, -- Obtenemos el nombre de la categoría (tipo de paquete)
+                       c.precio,
+                       u.usuario AS nombre_usuario_registro,
+                       p.estadoPago
+                FROM $tabla rp
+                INNER JOIN cliente ce ON rp.idClienteE = ce.id
+                INNER JOIN cliente cr ON rp.idClienteR = cr.id
+                INNER JOIN sucursal cs ON rp.idSucursalE = cs.id
+                INNER JOIN sucursal cs2 ON rp.idSucursalR = cs2.id
+                INNER JOIN detalleEncomienda dp ON rp.idDetalle = dp.id
+                INNER JOIN categoria c ON dp.idCategoria = c.id -- JOIN con la tabla de categorías para obtener el tipo y precio
+                INNER JOIN usuario u ON rp.idUsuario = u.id
+                LEFT JOIN pagos p ON rp.idPagos = p.id -- JOIN con la tabla de pagos para obtener el estado del pago
+            ");
                 $stmt->execute();
-                return $stmt->fetchAll();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC); // Devolver todas las filas
             }
         } catch (PDOException $e) {
-            echo "Error en la consulta: " . $e->getMessage();
+            echo "Error en la consulta: " . $e->getMessage(); // Mostrar el mensaje de error
             return false;
         }
+
+
+
+
+
         $stmt->close();
         $stmt = null;
     }

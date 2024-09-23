@@ -121,11 +121,11 @@
 
 
 <!-- Modal Editar Categoria -->
-<div class="modal fade" id="editContactModal" tabindex="-1" role="dialog" aria-labelledby="editContactModalTitle" aria-hidden="true">
+<div class="modal fade" id="editarcategoria" tabindex="-1" role="dialog" aria-labelledby="editarcategoria" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header d-flex align-items-center">
-        <h5 class="modal-title"> <i class="ti ti-user text-blue me-1 fs-5"></i> Editar Categoria</h5>
+        <h5 class="modal-title"> <i class="ti ti-building-store text-blue me-1 fs-5"></i> Editar Categoría</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -133,22 +133,16 @@
           <div class="edit-contact-content">
             <form method="post" enctype="multipart/form-data">
               <div class="mb-3">
-                <input type="text" name="editarCedula" id="editarCedula" class="form-control" placeholder="Ingrese cedula de identidad" required />
                 <input type="hidden" name="idCategoria" id="idCategoria" required>
+                <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre de la categoría" required />
               </div>
               <div class="mb-3">
-                <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre completo" required />
+                <input type="text" name="editarPrecio" id="editarPrecio" class="form-control" placeholder="Ingrese el precio" required />
               </div>
-              <div class="mb-3">
-                <input type="text" name="editarDireccion" id="editarDireccion" class="form-control" placeholder="Ingrese direccion" required />
-              </div>
-              <div class="mb-3">
-                <input type="text" name="editarTelefono" id="editarTelefono" class="form-control" placeholder="Telefono" required />
-              </div>
-              <button type="submit" class="btn btn-success">Guardar</button>
+              <button type="submit" class="btn btn-success">Guardar cambios</button>
               <?php
-              // $editarCategoria = new ControladorCategorias();
-              // $editarCategoria->ctrEditarCategoria();
+              $editarCategoria = new ControladorCategoria();
+              $editarCategoria->ctrEditarCategoria();
               ?>
             </form>
           </div>

@@ -15,7 +15,7 @@ class ControladorPaquetes
 {
     public static function ctrObtenerEnviosPorUsuario($idUsuario)
     {
-        $tabla = "recepcionencomienda";
+        $tabla = "recepcionEncomienda";
         $envios = ModeloPaquetes::mdlObtenerEnviosPorUsuario($tabla, $idUsuario);
     
         return $envios;
@@ -56,7 +56,7 @@ class ControladorPaquetes
     =============================================*/
     static public function ctrMostrarPaquetes($item, $valor)
     {
-        $tabla = "recepcionencomienda";
+        $tabla = "recepcionEncomienda";
         $respuesta = ModeloPaquetes::mdlMostrarPaquetes($tabla, $item, $valor);
         return $respuesta;
     }
@@ -73,7 +73,7 @@ class ControladorPaquetes
                 // Continúa con el proceso normal
                 $proximoNumeroRegistro = self::ctrObtenerSiguienteNumeroRegistro();
 
-                $tabla = "recepcionencomienda";
+                $tabla = "recepcionEncomienda";
                 $fechaRecepcion = date("Y-m-d H:i:s");
 
                 $sucursalLlegadaNombre = self::ctrObtenerNombreSucursal($_POST["sucursalLlegada"]);
@@ -186,10 +186,10 @@ class ControladorPaquetes
             error_log("Datos a insertar: " . print_r($datos, true));
 
             // Insertar en la base de datos usando el modelo
-            $respuesta = ModeloPaquetes::mdlIngresarPaqueteAPI("recepcionencomienda", $datos);
+            $respuesta = ModeloPaquetes::mdlIngresarPaqueteAPI("recepcionEncomienda", $datos);
 
             if ($respuesta == "ok") {
-                $idPaquete = ModeloPaquetes::mdlObtenerUltimoId("recepcionencomienda");
+                $idPaquete = ModeloPaquetes::mdlObtenerUltimoId("recepcionEncomienda");
 
                 // Enviar notificación por WhatsApp (si es necesario)
                 self::enviarNotificacionWhatsApp(
@@ -313,7 +313,7 @@ class ControladorPaquetes
     // Otros métodos...
     static public function ctrActualizarPaquete($datos)
     {
-        $tabla = "recepcionencomienda";
+        $tabla = "recepcionEncomienda";
         $respuesta = ModeloPaquetes::mdlActualizarPaquete($tabla, $datos);
 
         return $respuesta;
@@ -333,7 +333,7 @@ class ControladorPaquetes
     static public function ctrBorrarSucursal()
     {
         if (isset($_GET["idSucursal"])) {
-            $tabla = "recepcionencomienda";
+            $tabla = "recepcionEncomienda";
             $idSucursal = $_GET["idSucursal"];
 
             $respuesta = ModeloSucursales::mdlBorrarSucursal($tabla, $idSucursal);
@@ -365,7 +365,7 @@ class ControladorPaquetes
     =============================================*/
     static public function ctrObtenerSiguienteNumeroRegistro()
     {
-        $tabla = "recepcionencomienda";
+        $tabla = "recepcionEncomienda";
         $ultimoNumeroRegistro = ModeloPaquetes::mdlObtenerUltimoNumeroRegistro($tabla);
 
         // Incrementar el último número para el siguiente registro
