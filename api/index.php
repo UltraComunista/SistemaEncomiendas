@@ -9,6 +9,10 @@ require_once 'routes/routes.php';
 
 // Configurar encabezado de respuesta para JSON
 header('Content-Type: application/json');
+// Ruta para manejar el callback
+$app->post('/callback', function () {
+    CallbackController::handleCallback();
+});
 
 // Procesar la solicitud
 $router = new ApiRouter();
