@@ -105,6 +105,7 @@ $(document).on("click", ".btnEditarPaquete", function () {
     success: function (response) {
       if (response) {
         var htmlContent = `
+        <input type="hidden" id="idPagos" name="idPagos" value="${response.idPagos}">
           <input type="hidden" id="idPaquete" name="idPaquete" value="${response.id}">
           <div class="container">
             <!-- Campos del formulario -->
@@ -163,57 +164,10 @@ $(document).on("click", ".btnEditarPaquete", function () {
 
 $(document).on("click", "#update-status-btn", function () {
   var idPaquete = $("#idPaquete").val();
+  var estadoPaquete = $("#estadoPaquete").val();
+  var estadoPago = $("#estadoPago").val();
+  var idPagos = $("#idPagos").val(); // Asegúrate de que el idPagos esté en el formulario
 
-  // Verificar que idPaquete tiene un valor
-  if (!idPaquete) {
-    Swal.fire("Error", "No se pudo obtener el ID del paquete.", "error");
-    return;
-  }
-
-  var estadoPaquete = document.getElementById("estadoPaquete").value;
-  var estadoPago = document.getElementById("estadoPago").value;
-
-  if (estadoPago === '2') {
-    // Mostrar el SweetAlert de cargando para el pago QR
-    Swal.fire({
-      title: "Cargando...",
-      text: "Esperando confirmación de pago...",
-      icon: "info",
-      showConfirmButton: false,
-      allowOutsideClick: false
-    });
-
-    // Hacer la solicitud a la API para crear la orden de pago QR
-    $.ajax({
-      url: "ajax/paquetes.ajax.php",
-      method: "POST",
-      data: {
-        idPaquete: idPaquete,
-        action: 'createOrder'
-      },
-      dataType: "json",
-      success: function (result) {
-        if (result.payment_url) {
-          console.log("Enlace de pago generado:", result.payment_url);
-
-          // Redirigir al enlace de pago en la misma ventana
-          window.location.href = result.payment_url;
-
-        } else {
-          console.error("Error al generar el pago:", result.error || "No se pudo generar el pago");
-          Swal.fire("Error", result.error || "No se pudo generar el pago", "error");
-        }
-      },
-      error: function (xhr, status, error) {
-        Swal.fire("Error", "Hubo un problema al contactar la API: " + error, "error");
-      }
-    });
-
-    // Detener el flujo aquí para evitar que continúe con la actualización
-    return;
-  }
-
-  // Si no es "Pagado QR", actualizar el estado normalmente
   $.ajax({
     url: "ajax/paquetes.ajax.php",
     method: "POST",
@@ -221,47 +175,38 @@ $(document).on("click", "#update-status-btn", function () {
       idPaquete: idPaquete,
       estadoPaquete: estadoPaquete,
       estadoPago: estadoPago,
+      idPagos: idPagos,  // Pasar el ID de pagos
       action: 'updateStatus'
     },
+    dataType: "json",
     success: function (response) {
-      console.log("Respuesta del servidor: ", response);
-      if (response.trim() === "ok") {
-        let mensaje = '';
-        if (estadoPago === '0') {
-          mensaje = 'Estado actualizado a Debe correctamente';
-        } else if (estadoPago === '1') {
-          mensaje = 'Estado actualizado a Pagado correctamente';
-        } else {
-          mensaje = 'Estado actualizado correctamente';
-        }
-
+      if (response.status === 'ok') {
         Swal.fire({
-          title: 'Éxito',
-          text: mensaje,
-          icon: 'success',
-          confirmButtonText: 'OK'
+          title: 'Actualización Exitosa',
+          text: response.message,
+          icon: 'success'
         }).then(() => {
-          location.reload();
+          location.reload(); // Recargar la página después de la actualización
         });
       } else {
         Swal.fire({
           title: 'Error',
-          text: 'Error al actualizar el estado: ' + response,
-          icon: 'error',
-          confirmButtonText: 'OK'
+          text: response.message || 'No se pudo actualizar el estado.',
+          icon: 'error'
         });
       }
     },
     error: function (xhr, status, error) {
+      console.error("Error en la solicitud Ajax:", error);
       Swal.fire({
         title: 'Error',
-        text: 'Hubo un problema al contactar el servidor: ' + error,
-        icon: 'error',
-        confirmButtonText: 'OK'
+        text: 'Ocurrió un error al intentar actualizar el estado.',
+        icon: 'error'
       });
     }
   });
 });
+
 
 
 

@@ -7,7 +7,7 @@
         <div class="col-4">
           <div class="card">
             <div class="cad-body wizard-content">
-              <form class="validation-wizard wizard-circle mt-5" id="paqueteForm" method="post">
+              <form class="validation-wizard wizard-circle mt-5" id="paqueteForm" method="post" action="/localhost/controladores/paquetes.controlador.php">
                 <!-- Remitente -->
                 <h6>Remitente</h6>
                 <section>
@@ -72,8 +72,6 @@
                     </div>
                   </div>
                 </section>
-
-
 
                 <!-- Sucursal -->
                 <?php
@@ -170,12 +168,6 @@
                         <option value="1">Domiciliario</option>
                       </select>
                     </div>
-
-                    <div class="mb-3" id="direccionContainer" style="display: none;">
-                      <label for="direccionDomiciliario">Dirección:</label>
-                      <input type="text" class="form-control" id="direccionDomiciliario" name="direccionDomiciliario" />
-                    </div>
-
                   </div>
                 </section>
                 <!-- Detalles del Paquete -->
@@ -217,14 +209,9 @@
                     </div>
                   </div>
                 </section>
-
-               
-
-
-
               </form>
 
-              <!-- sample modal content -->
+              <!-- Modal Actualizar estado -->
               <div class="modal fade" id="bs-example-modal-xlg" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
                 <div class="modal-dialog modal-xl">
                   <div class="modal-content">

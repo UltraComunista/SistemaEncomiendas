@@ -60,38 +60,43 @@
             <tbody>
               <?php
               $Pagoss = ControladorPagos::ctrMostrarPagos(null, null);
+
               $contador = 1;
               foreach ($Pagoss as $key => $value) {
+                // Método de pago
+                $metodoPago = '';
+                switch ($value["metodoPago"]) {
+                  case 0:
+                    $metodoPago = 'Efectivo';
+                    break;
+                  case 1:
+                    $metodoPago = 'QR';
+                    break;
+                  default:
+                    $metodoPago = 'Otro';
+                    break;
+                }
+
+                // Estado de Pago
+                $estadoPago = $value["estadoPago"] == 1 ?
+                  '<span class="mb-1 badge rounded-pill text-bg-success">Pagado</span>' :
+                  '<span class="mb-1 badge rounded-pill text-bg-danger">Por pagar</span>';
+
                 echo '<tr>';
                 echo '<td>' . $contador . '</td>';
                 echo '<td>' . $value["idTransaccion"] . '</td>';
-                echo '<td>' . $value["metodoPago"] . '</td>';
-                echo '<td>' . $value["estadoPago"] . '</td>';
+                echo '<td>' . $metodoPago . '</td>';
+                echo '<td>' . $estadoPago . '</td>';
                 echo '<td>' . $value["monto"] . '</td>';
-                echo '<td>
-                  <div class="dropdown dropstart">
-                    <a href="#" class="text-muted" id="dropdownMenuButton' . $value["id"] . '" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="ti ti-dots fs-5"></i>
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton' . $value["id"] . '">
-                      <li>
-                        <a class="dropdown-item d-flex align-items-center gap-3 btnEditarPagos" idPagos="' . $value["id"] . '" href="#" data-bs-toggle="modal" data-bs-target="#editContactModal">
-                          <i class="fs-4 ti ti-edit"></i>Editar
-                        </a>
-                      </li>
-                      <li>
-                        <a class="dropdown-item d-flex align-items-center gap-3 btnEliminarPagos" idPagos="' . $value["id"] . '" href="#">
-                          <i class="fs-4 ti ti-trash"></i>Eliminar
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </td>';
+                echo '<td class="text-center">
+      <button class="btn btn-info btn-sm">Info</button>
+    </td>';
                 $contador++;
                 echo '</tr>';
               }
               ?>
             </tbody>
+
           </table>
         </div>
       </div>

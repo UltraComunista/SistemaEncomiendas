@@ -28,6 +28,11 @@ $(document).ready(function () {
     onFinished: function (event, currentIndex) {
       event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
 
+      console.log("Evento onFinished activado"); // Verifica que este log aparece en la consola.
+
+      var formData = form.serialize() + '&action=createPaquete';
+      console.log("Form data to be sent:", formData); // Añadir log de depuración
+
       var formData = form.serialize() + '&action=createPaquete';
       console.log("Form data to be sent:", formData); // Añadir log de depuración
 
@@ -36,17 +41,21 @@ $(document).ready(function () {
         method: "POST",
         data: formData,
         success: function (response) {
-          console.log("Response from server:", response); // Añadir log de depuración
+          console.log("Response from server:", response); // Verifica el contenido de la respuesta aquí.
+
+          let res;
           try {
-            var res = JSON.parse(response);
-            if (res.status === 'ok') {
+            // Si la respuesta no es un objeto, se intenta parsear
+            res = typeof response === 'object' ? response : JSON.parse(response);
+            console.log("Parsed response:", res); // Verificar que el objeto `res` se haya parseado correctamente.
+
+            // Verificación adicional para asegurar que el JSON tenga la estructura esperada
+            if (res && res.status === 'ok') {
               Swal.fire({
                 title: 'Formulario Enviado!',
-                text: 'El paquete ha sido guardado correctamente.',
+                text: res.message || 'El paquete ha sido guardado correctamente.',
                 icon: 'success'
               }).then(() => {
-                // Abrir el PDF en una nueva ventana o pestaña con el id del paquete
-                window.open('reportes/guia_envio.php?idPaquete=' + res.id, '_blank');
                 location.reload(); // Recargar la página después de mostrar el SweetAlert
               });
             } else {
@@ -65,6 +74,8 @@ $(document).ready(function () {
             });
           }
         },
+
+
         error: function (error) {
           console.error("Error in Ajax request:", error);
           Swal.fire({

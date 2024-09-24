@@ -91,31 +91,39 @@
   </section>
 </div>
 
-<!-- Modal -->
+<!-- Modal Agregar Cliente -->
 <div class="modal fade" id="agregarcliente" tabindex="-1" role="dialog" aria-labelledby="addContactModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h5 class="modal-title"> <i class="ti ti-building-store text-blue me-1 fs-5"></i> Nuevo Cliente</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header d-flex align-items-center bg-primary text-white">
+        <h5 class="modal-title text-white"> <i class="ti ti-user text-white me-1 fs-5"></i> Nuevo Cliente</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="add-contact-box">
           <div class="add-contact-content">
             <form method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <input type="text" name="nuevoCedula" class="form-control" placeholder="Ingrese cedula de identidad" required />
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoCedula" class="form-label"><i class="ti ti-id me-2"></i>Cédula de Identidad</label>
+                  <input type="text" name="nuevoCedula" class="form-control" placeholder="Ingrese cédula de identidad" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoNombre" class="form-label"><i class="ti ti-user me-2"></i>Nombre Completo</label>
+                  <input type="text" name="nuevoNombre" class="form-control" placeholder="Ingrese nombre completo" required />
+                </div>
               </div>
-              <div class="mb-3">
-                <input type="text" name="nuevoNombre" class="form-control" placeholder="Ingrese nombre completo" required />
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoDireccion" class="form-label"><i class="ti ti-home me-2"></i>Dirección</label>
+                  <input type="text" name="nuevoDireccion" class="form-control" placeholder="Ingrese dirección" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoTelefono" class="form-label"><i class="ti ti-phone me-2"></i>Teléfono</label>
+                  <input type="text" name="nuevoTelefono" class="form-control" placeholder="Ingrese teléfono" required />
+                </div>
               </div>
-              <div class="mb-3">
-                <input type="text" name="nuevoDireccion" class="form-control" placeholder="Ingrese direccion" required />
-              </div>
-              <div class="mb-3">
-                <input type="text" name="nuevoTelefono" class="form-control" placeholder="Telefono" required />
-              </div>
-              <button type="submit" class="btn btn-success">Agregar</button>
+              <button type="submit" class="btn btn-primary w-100">Agregar Cliente</button>
               <?php
               $crearCliente = new ControladorClientes();
               $crearCliente->ctrCrearCliente();
@@ -133,28 +141,37 @@
 <div class="modal fade" id="editarcliente" tabindex="-1" role="dialog" aria-labelledby="editContactModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h5 class="modal-title"> <i class="ti ti-user text-blue me-1 fs-5"></i> Editar Cliente</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header d-flex align-items-center bg-primary text-white">
+        <h5 class="modal-title text-white"> <i class="ti ti-user text-white me-1 fs-5"></i> Editar Cliente</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      
       <div class="modal-body">
         <div class="edit-contact-box">
           <div class="edit-contact-content">
             <form method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <input type="text" name="editarCedula" id="editarCedula" class="form-control" placeholder="Ingrese cedula de identidad" required />
-                <input type="hidden" name="idCliente" id="idCliente" required>
+              <input type="hidden" name="idCliente" id="idCliente" required>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="editarCedula" class="form-label"><i class="ti ti-id me-2"></i>Cédula de Identidad</label>
+                  <input type="text" name="editarCedula" id="editarCedula" class="form-control" placeholder="Ingrese cédula de identidad" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="editarNombre" class="form-label"><i class="ti ti-user me-2"></i>Nombre Completo</label>
+                  <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre completo" required />
+                </div>
               </div>
-              <div class="mb-3">
-                <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre completo" required />
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="editarDireccion" class="form-label"><i class="ti ti-home me-2"></i>Dirección</label>
+                  <input type="text" name="editarDireccion" id="editarDireccion" class="form-control" placeholder="Ingrese dirección" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="editarTelefono" class="form-label"><i class="ti ti-phone me-2"></i>Teléfono</label>
+                  <input type="text" name="editarTelefono" id="editarTelefono" class="form-control" placeholder="Ingrese teléfono" required />
+                </div>
               </div>
-              <div class="mb-3">
-                <input type="text" name="editarDireccion" id="editarDireccion" class="form-control" placeholder="Ingrese direccion" required />
-              </div>
-              <div class="mb-3">
-                <input type="text" name="editarTelefono" id="editarTelefono" class="form-control" placeholder="Telefono" required />
-              </div>
-              <button type="submit" class="btn btn-success">Guardar</button>
+              <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
               <?php
               $editarCliente = new ControladorClientes();
               $editarCliente->ctrEditarCliente();

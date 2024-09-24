@@ -127,64 +127,95 @@
     <!-- Modal -->
     <div class="modal fade" id="agregarusuario" tabindex="-1" role="dialog" aria-labelledby="addContactModalTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header d-flex align-items-center">
-            <h5 class="modal-title"> <i class="ti ti-user text-blue me-1 fs-5"></i> Nuevo usuario</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content shadow-lg">
+          <div class="modal-header d-flex align-items-center bg-primary text-white">
+            <h5 class="modal-title text-white"> <i class="ti ti-user text-white me-1 fs-5"></i> Nuevo Usuario</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="add-contact-box">
               <div class="add-contact-content">
                 <form id="addContactModalTitle" method="post" enctype="multipart/form-data">
-                  <div class="mb-3">
-                    <input type="text" name="nuevoNombre" class="form-control" placeholder="Ingrese nombre" required />
-                  </div>
-                  <div class="mb-3" id="apellidoContainer">
-                    <input type="text" name="nuevoApellido" class="form-control" placeholder="Ingrese apellido" required />
+                  <!-- Sección de Datos Personales -->
+                  <h6 class="mb-3 text-primary">Datos Personales</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevoNombre" class="form-label"><i class="ti ti-id-badge me-2"></i>Nombre</label>
+                      <input type="text" name="nuevoNombre" class="form-control" placeholder="Ingrese nombre" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevoApellido" class="form-label"><i class="ti ti-id-badge me-2"></i>Apellido</label>
+                      <input type="text" name="nuevoApellido" class="form-control" placeholder="Ingrese apellido" required />
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <input type="text" name="nuevoCedula" class="form-control" placeholder="Ingrese cédula de identidad" required />
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevoCedula" class="form-label"><i class="ti ti-credit-card me-2"></i>Cédula de Identidad</label>
+                      <input type="text" name="nuevoCedula" class="form-control" placeholder="Ingrese cédula de identidad" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevoTelefono" class="form-label"><i class="ti ti-phone me-2"></i>Teléfono</label>
+                      <input type="text" name="nuevoTelefono" class="form-control" placeholder="Ingrese teléfono" />
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <input type="text" name="nuevoUsuario" class="form-control" placeholder="Usuario" required />
+
+                  <!-- Sección de Credenciales -->
+                  <h6 class="mb-3 text-primary">Credenciales de Acceso</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevoUsuario" class="form-label"><i class="ti ti-user me-2"></i>Usuario</label>
+                      <input type="text" name="nuevoUsuario" class="form-control" placeholder="Usuario" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevoPassword" class="form-label"><i class="ti ti-lock me-2"></i>Contraseña</label>
+                      <input type="password" name="nuevoPassword" class="form-control" placeholder="Contraseña" required />
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <input type="password" name="nuevoPassword" class="form-control" placeholder="Contraseña" required />
+
+                  <!-- Sección de Información Adicional -->
+                  <h6 class="mb-3 text-primary">Información Adicional</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevoPerfil" class="form-label"><i class="ti ti-id me-2"></i>Perfil</label>
+                      <select class="form-select" name="nuevoPerfil" required>
+                        <option value="">Seleccione un perfil...</option>
+                        <option value="1">Administrador</option>
+                        <option value="2">Recepción</option>
+                        <option value="3">Delivery</option>
+                        <option value="4">Ayudante</option>
+                        <option value="5">Empresa</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevaSucursal" class="form-label"><i class="ti ti-building me-2"></i>Sucursal</label>
+                      <select class="form-select" name="nuevaSucursal" required>
+                        <option value="">Seleccione una sucursal...</option>
+                        <?php
+                        $sucursales = ControladorSucursales::ctrMostrarSucursales(null, null);
+                        foreach ($sucursales as $sucursal) {
+                          echo '<option value="' . $sucursal["id"] . '">' . $sucursal["nombre"] . '</option>';
+                        }
+                        ?>
+                      </select>
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <select class="form-select" name="nuevoPerfil" required>
-                      <option value="">Perfil...</option>
-                      <option value="1">Administrador</option>
-                      <option value="2">Recepción</option>
-                      <option value="3">Delivery</option>
-                      <option value="4">Ayudante</option>
-                      <option value="5">Empresa</option>
-                    </select>
+
+                  <!-- Sección de Dirección -->
+                  <h6 class="mb-3 text-primary">Datos de Contacto</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevaDireccion" class="form-label"><i class="ti ti-map-pin me-2"></i>Dirección</label>
+                      <input type="text" name="nuevaDireccion" class="form-control" placeholder="Ingrese dirección" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="nuevaFoto" class="form-label"><i class="ti ti-camera me-2"></i>Foto de Perfil</label>
+                      <input type="file" name="nuevaFoto" class="form-control">
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <select class="form-select" name="nuevaSucursal" required>
-                      <option value="">Seleccione una sucursal...</option>
-                      <?php
-                      $sucursales = ControladorSucursales::ctrMostrarSucursales(null, null);
-                      foreach ($sucursales as $sucursal) {
-                        echo '<option value="' . $sucursal["id"] . '">' . $sucursal["nombre"] . '</option>';
-                      }
-                      ?>
-                    </select>
-                  </div>
-                  <!-- Campo para la dirección -->
-                  <div class="mb-3">
-                    <input type="text" name="nuevaDireccion" class="form-control" placeholder="Ingrese dirección" />
-                  </div>
-                  <!-- Campo para el teléfono -->
-                  <div class="mb-3">
-                    <input type="text" name="nuevoTelefono" class="form-control" placeholder="Ingrese teléfono" />
-                  </div>
-                  <div class="mb-3">
-                    <input type="file" name="nuevaFoto" class="form-control">
-                  </div>
-                  <button type="submit" class="btn btn-success">Registrar</button>
+
+                  <button type="submit" class="btn btn-primary w-100">Registrar Usuario</button>
+
                   <?php
                   $crearUsuario = new ControladorUsuarios();
                   $crearUsuario->ctrCrearUsuario();
@@ -196,60 +227,95 @@
         </div>
       </div>
     </div>
+
     <!-- Modal Editar-->
     <div class="modal fade" id="editarusuario" tabindex="-1" role="dialog" aria-labelledby="editContactModalTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-          <div class="modal-header d-flex align-items-center">
-            <h5 class="modal-title"> <i class="ti ti-user text-blue me-1 fs-5"></i> Editar usuario</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-header d-flex align-items-center bg-primary text-white">
+            <h5 class="modal-title text-white"> <i class="ti ti-user text-white me-1 fs-5"></i> Editar Usuario</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="edit-contact-box">
               <div class="edit-contact-content">
                 <form method="post" enctype="multipart/form-data">
+                  <!-- Inputs ocultos -->
                   <input type="hidden" name="idUsuario" id="idUsuario" />
                   <input type="hidden" name="passwordActual" id="passwordActual" />
                   <input type="hidden" name="fotoActual" id="fotoActual">
-                  <div class="mb-3">
-                    <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre" required />
+
+                  <!-- Sección de Datos Personales -->
+                  <h6 class="mb-3 text-primary">Datos Personales</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="editarNombre" class="form-label"><i class="ti ti-id-badge me-2"></i>Nombre</label>
+                      <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="editarApellido" class="form-label"><i class="ti ti-id-badge me-2"></i>Apellido</label>
+                      <input type="text" name="editarApellido" id="editarApellido" class="form-control" placeholder="Ingrese apellido" required />
+                    </div>
                   </div>
-                  <div class="mb-3" id="editarApellidoContainer">
-                    <input type="text" name="editarApellido" id="editarApellido" class="form-control" placeholder="Ingrese apellido" required />
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="editarCedula" class="form-label"><i class="ti ti-credit-card me-2"></i>Cédula de Identidad</label>
+                      <input type="text" name="editarCedula" id="editarCedula" class="form-control" placeholder="Ingrese cédula de identidad" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="editarTelefono" class="form-label"><i class="ti ti-phone me-2"></i>Teléfono</label>
+                      <input type="text" name="editarTelefono" id="editarTelefono" class="form-control" placeholder="Ingrese teléfono" />
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <input type="text" name="editarCedula" id="editarCedula" class="form-control" placeholder="Ingrese cedula" required />
+
+                  <!-- Sección de Credenciales -->
+                  <h6 class="mb-3 text-primary">Credenciales de Acceso</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="editarUsuario" class="form-label"><i class="ti ti-user me-2"></i>Usuario</label>
+                      <input type="text" name="editarUsuario" id="editarUsuario" class="form-control" placeholder="Usuario" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="editarPerfil" class="form-label"><i class="ti ti-id me-2"></i>Perfil</label>
+                      <select class="form-select" name="editarPerfil" id="editarPerfil" required>
+                        <option value="1">Administrador</option>
+                        <option value="2">Recepción</option>
+                        <option value="3">Delivery</option>
+                        <option value="4">Ayudante</option>
+                        <option value="5">Empresa</option>
+                      </select>
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <input type="text" name="editarDireccion" id="editarDireccion" class="form-control" placeholder="Ingrese dirección" />
+
+                  <!-- Sección de Información Adicional -->
+                  <h6 class="mb-3 text-primary">Información Adicional</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="editarDireccion" class="form-label"><i class="ti ti-map-pin me-2"></i>Dirección</label>
+                      <input type="text" name="editarDireccion" id="editarDireccion" class="form-control" placeholder="Ingrese dirección" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="editarToken" class="form-label"><i class="ti ti-shield me-2"></i>Token de Empresa (No Editable)</label>
+                      <input type="text" name="editarToken" id="editarToken" class="form-control" readonly />
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <input type="text" name="editarTelefono" id="editarTelefono" class="form-control" placeholder="Ingrese teléfono" />
+
+                  <!-- Sección de Foto -->
+                  <h6 class="mb-3 text-primary">Foto de Perfil</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="editarFoto" class="form-label"><i class="ti ti-camera me-2"></i>Foto</label>
+                      <input type="file" name="editarFoto" id="editarFoto" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <img src="" id="previsualizar" class="img-thumbnail" width="100" height="100">
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <input type="text" class="form-control" name="editarUsuario" id="editarUsuario" placeholder="Usuario" required />
-                  </div>
-                  <div class="mb-3">
-                    <select class="form-select" name="editarPerfil" id="editarPerfil" required>
-                      <option value="1">Administrador</option>
-                      <option value="2">Recepcion</option>
-                      <option value="3">Delivery</option>
-                      <option value="4">Ayudante</option>
-                      <option value="5">Empresa</option>
-                    </select>
-                  </div>
-                  <div class="mb-3">
-                    <label for="editarToken">Token de Empresa (No Editable)</label>
-                    <input type="text" class="form-control" name="editarToken" id="editarToken" readonly />
-                  </div>
-                  <div class="mb-3">
-                    <img src="" id="previsualizar" class="img-thumbnail" width="100" height="100">
-                  </div>
-                  <div class="mb-3">
-                    <input type="file" name="editarFoto" id="editarFoto" class="form-control">
-                  </div>
-                  <button type="button" id="resetUsuarioPassword" class="btn btn-warning">Resetear Usuario y Contraseña</button>
-                  <button type="submit" class="btn btn-success">Guardar cambios</button>
+
+                  <button type="button" id="resetUsuarioPassword" class="btn btn-warning mb-3 w-100">Resetear Usuario y Contraseña</button>
+                  <button type="submit" class="btn btn-success w-100">Guardar Cambios</button>
+
                   <?php
                   $editarUsuarios = new ControladorUsuarios();
                   $editarUsuarios->ctrEditarUsuario();

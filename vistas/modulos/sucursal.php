@@ -132,53 +132,69 @@
 </div>
 
 <!-- Modal -->
+<!-- Modal Agregar-->
 <div class="modal fade" id="agregarsucursal" tabindex="-1" role="dialog" aria-labelledby="addContactModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h5 class="modal-title"> <i class="ti ti-building-store text-blue me-1 fs-5"></i> Nueva Sucursal</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header d-flex align-items-center bg-primary text-white">
+        <h5 class="modal-title text-white"> <i class="ti ti-building-store text-white me-1 fs-5"></i> Nueva Sucursal</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="add-contact-box">
           <div class="add-contact-content">
             <form id="addContactModalTitle" method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <input type="text" name="nuevoNombre" class="form-control" placeholder="Ingrese nombre de la sucursal" required />
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoNombre" class="form-label"><i class="ti ti-id-badge me-2"></i>Nombre de la Sucursal</label>
+                  <input type="text" name="nuevoNombre" class="form-control" placeholder="Ingrese nombre de la sucursal" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoDepartamento" class="form-label"><i class="ti ti-map me-2"></i>Departamento</label>
+                  <select class="form-select" name="nuevoDepartamento" id="nuevoDepartamento" required>
+                    <option value="">Departamento...</option>
+                    <option value="1">Santa Cruz</option>
+                    <option value="2">La Paz</option>
+                    <option value="3">Cochabamba</option>
+                    <option value="4">Sucre</option>
+                    <option value="5">Potosí</option>
+                    <option value="6">Oruro</option>
+                    <option value="7">Beni</option>
+                    <option value="8">Pando</option>
+                    <option value="9">Tarija</option>
+                  </select>
+                </div>
               </div>
-              <div class="mb-3">
-                <select class="form-select" name="nuevoDepartamento" id="nuevoDepartamento" required>
-                  <option value="">Departamento...</option>
-                  <option value="1">Santa Cruz</option>
-                  <option value="2">La Paz</option>
-                  <option value="3">Cochabamba</option>
-                  <option value="4">Sucre</option>
-                  <option value="5">Potosi</option>
-                  <option value="6">Oruro</option>
-                  <option value="7">Beni</option>
-                  <option value="8">Pando</option>
-                  <option value="9">Tarija</option>
-                </select>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nuevaProvincia" class="form-label"><i class="ti ti-map-pin me-2"></i>Provincia</label>
+                  <select class="form-select" name="nuevaProvincia" id="nuevaProvincia" required>
+                    <option value="">Provincia...</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="nuevaDireccion" class="form-label"><i class="ti ti-home me-2"></i>Dirección</label>
+                  <input type="text" name="nuevaDireccion" class="form-control" placeholder="Ingrese dirección" required />
+                </div>
               </div>
-              <div class="mb-3">
-                <select class="form-select" name="nuevaProvincia" id="nuevaProvincia" required>
-                  <option value="">Provincia...</option>
-                </select>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoTelefono" class="form-label"><i class="ti ti-phone me-2"></i>Teléfono</label>
+                  <input type="text" name="nuevoTelefono" class="form-control" placeholder="Ingrese teléfono" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoEstado" class="form-label"><i class="ti ti-check me-2"></i>Estado</label>
+                  <select class="form-select" name="nuevoEstado" required>
+                    <option value="">Estado...</option>
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
+                  </select>
+                </div>
               </div>
-              <div class="mb-3">
-                <input type="text" name="nuevaDireccion" class="form-control" placeholder="Ingrese dirección" required />
-              </div>
-              <div class="mb-3">
-                <input type="text" name="nuevoTelefono" class="form-control" placeholder="Ingrese teléfono" required />
-              </div>
-              <div class="mb-3">
-                <select class="form-select" name="nuevoEstado" required>
-                  <option value="">Estado...</option>
-                  <option value="1">Activo</option>
-                  <option value="0">Inactivo</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-success">Registrar</button>
+
+              <button type="submit" class="btn btn-primary w-100">Registrar Sucursal</button>
               <?php
               $crearSucursal = new ControladorSucursales();
               $crearSucursal->ctrCrearSucursal();
@@ -190,58 +206,76 @@
     </div>
   </div>
 </div>
+
+<!-- Modal Editar-->
 <!-- Modal Editar-->
 <div class="modal fade" id="editarsucursal" tabindex="-1" role="dialog" aria-labelledby="editContactModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h5 class="modal-title">
-          <i class="ti ti-building-store text-blue me-1 fs-5"></i> Editar Sucursal
+      <div class="modal-header d-flex align-items-center bg-primary text-white">
+        <h5 class="modal-title text-white">
+          <i class="ti ti-building-store text-white me-1 fs-5"></i> Editar Sucursal
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="edit-contact-box">
           <div class="edit-contact-content">
             <form id="editContactModalTitle" method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese sucursal" required />
-                <input type="hidden" name="idSucursal" id="idSucursal" required>
+              <input type="hidden" name="idSucursal" id="idSucursal" required>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="editarNombre" class="form-label"><i class="ti ti-id-badge me-2"></i>Nombre de la Sucursal</label>
+                  <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre de la sucursal" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="editarDepartamento" class="form-label"><i class="ti ti-map me-2"></i>Departamento</label>
+                  <select class="form-select" name="editarDepartamento" id="editarDepartamento" required>
+                    <option value="">Departamento...</option>
+                    <option value="1">Santa Cruz</option>
+                    <option value="2">La Paz</option>
+                    <option value="3">Cochabamba</option>
+                    <option value="4">Sucre</option>
+                    <option value="5">Potosí</option>
+                    <option value="6">Oruro</option>
+                    <option value="7">Beni</option>
+                    <option value="8">Pando</option>
+                    <option value="9">Tarija</option>
+                  </select>
+                </div>
               </div>
-              <div class="mb-3">
-                <select class="form-select" name="editarDepartamento" id="editarDepartamento" required>
-                  <option value="">Departamento...</option>
-                  <option value="1">Santa Cruz</option>
-                  <option value="2">La Paz</option>
-                  <option value="3">Cochabamba</option>
-                  <option value="4">Sucre</option>
-                  <option value="5">Potosi</option>
-                  <option value="6">Oruro</option>
-                  <option value="7">Beni</option>
-                  <option value="8">Pando</option>
-                  <option value="9">Tarija</option>
-                </select>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="editarProvincia" class="form-label"><i class="ti ti-map-pin me-2"></i>Provincia</label>
+                  <select class="form-select" name="editarProvincia" id="editarProvincia" required>
+                    <option value="">Provincia...</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="editarDireccion" class="form-label"><i class="ti ti-home me-2"></i>Dirección</label>
+                  <input type="text" name="editarDireccion" id="editarDireccion" class="form-control" placeholder="Ingrese dirección" required />
+                </div>
               </div>
-              <div class="mb-3">
-                <select class="form-select" name="editarProvincia" id="editarProvincia" required>
-                  <option value="">Provincias...</option>
-                </select>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="editarTelefono" class="form-label"><i class="ti ti-phone me-2"></i>Teléfono</label>
+                  <input type="text" name="editarTelefono" id="editarTelefono" class="form-control" placeholder="Ingrese teléfono" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="editarEstado" class="form-label"><i class="ti ti-check me-2"></i>Estado</label>
+                  <select class="form-select" name="editarEstado" id="editarEstado" required>
+                    <option value="">Estado...</option>
+                    <option value="1">En línea</option>
+                    <option value="2">Desconectado</option>
+                    <option value="3">Fuera de servicio</option>
+                  </select>
+                </div>
               </div>
-              <div class="mb-3">
-                <input type="text" name="editarDireccion" id="editarDireccion" class="form-control" placeholder="Dirección" required />
-              </div>
-              <div class="mb-3">
-                <input type="text" name="editarTelefono" id="editarTelefono" class="form-control" placeholder="Teléfono" required />
-              </div>
-              <div class="mb-3">
-                <select class="form-select" name="editarEstado" id="editarEstado" required>
-                  <option value="">Estado...</option>
-                  <option value="1">En línea</option>
-                  <option value="2">Desconectado</option>
-                  <option value="3">Fuera de servicio</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-success">Guardar cambios</button>
+
+              <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
               <?php
               $editarSucursal = new ControladorSucursales();
               $editarSucursal->ctrEditarSucursal();

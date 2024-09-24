@@ -4,6 +4,32 @@ require_once "conexion.php";
 
 class ModeloPaquetes
 {
+    static public function mdlActualizarPagoEnPaquete($tabla, $nroRegistro, $idPago)
+    {
+        try {
+            $db = Conexion::conectar();
+
+            // Prepara la consulta SQL para actualizar el ID de pago en la tabla de paquetes
+            $stmt = $db->prepare("UPDATE $tabla 
+                              SET idPagos = :idPago 
+                              WHERE nro_registro = :nroRegistro");
+
+            // Asigna los valores a los parámetros
+            $stmt->bindParam(":idPago", $idPago, PDO::PARAM_INT);
+            $stmt->bindParam(":nroRegistro", $nroRegistro, PDO::PARAM_INT);
+
+            // Ejecuta la consulta y verifica el éxito
+            if ($stmt->execute()) {
+                return "ok";
+            } else {
+                return "error";
+            }
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return "error";
+        }
+    }
+
     public static function mdlObtenerEnviosPorUsuario($tabla, $idUsuario)
     {
         try {
@@ -20,7 +46,7 @@ class ModeloPaquetes
                 INNER JOIN cliente cr ON rp.idclienteR = cr.id
                 INNER JOIN sucursal cs ON rp.idSucursalE = cs.id
                 INNER JOIN sucursal cs2 ON rp.idSucursalR = cs2.id
-                INNER JOIN detelleEncomienda dp ON rp.idDetalle = dp.id
+                INNER JOIN detalleEncomienda dp ON rp.idDetalle = dp.id
                 INNER JOIN usuario u ON rp.idUsuario = u.id -- Unión con la tabla de usuarios para obtener el nombre del usuario
                 WHERE rp.idUsuario = :idUsuario
             ");
@@ -166,34 +192,25 @@ class ModeloPaquetes
     {
         $db = Conexion::conectar();
         try {
+            // Iniciamos la transacción
             $db->beginTransaction();
 
-            // Verificar si el usuario es una empresa (perfil = 5)
-            $stmt = $db->prepare("SELECT perfil FROM usuario WHERE id = :idUsuario");
-            $stmt->bindParam(":idUsuario", $datos["idUsuario"], PDO::PARAM_INT);
+            // Verificar si el cliente enviador ya existe
+            $stmt = $db->prepare("SELECT id FROM cliente WHERE cedula = :cedulaE");
+            $stmt->bindParam(":cedulaE", $datos["cedula_enviador"], PDO::PARAM_STR);
             $stmt->execute();
-            $perfilUsuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($perfilUsuario['perfil'] == 5) {
-                $idClienteE = $datos['idUsuario']; // Usamos el idUsuario como idclienteE
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($result) {
+                $idClienteE = $result['id'];
             } else {
-                // Verificar si el cliente enviador ya existe
-                $stmt = $db->prepare("SELECT id FROM cliente WHERE cedula = :cedulaE");
+                // Insertar datos del cliente enviador
+                $stmt = $db->prepare("INSERT INTO cliente (nombre, cedula, telefono, direccion) VALUES (:nombreE, :cedulaE, :telefonoE, :direccionE)");
+                $stmt->bindParam(":nombreE", $datos["nombre_enviador"], PDO::PARAM_STR);
                 $stmt->bindParam(":cedulaE", $datos["cedula_enviador"], PDO::PARAM_STR);
+                $stmt->bindParam(":telefonoE", $datos["telefono_enviador"], PDO::PARAM_STR);
+                $stmt->bindParam(":direccionE", $datos["direccion_enviador"], PDO::PARAM_STR);
                 $stmt->execute();
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($result) {
-                    $idClienteE = $result['id'];
-                } else {
-                    // Insertar datos del cliente enviador
-                    $stmt = $db->prepare("INSERT INTO cliente (nombre, cedula, telefono, direccion) VALUES (:nombreE, :cedulaE, :telefonoE, :direccionE)");
-                    $stmt->bindParam(":nombreE", $datos["nombre_enviador"], PDO::PARAM_STR);
-                    $stmt->bindParam(":cedulaE", $datos["cedula_enviador"], PDO::PARAM_STR);
-                    $stmt->bindParam(":telefonoE", $datos["telefono_enviador"], PDO::PARAM_STR);
-                    $stmt->bindParam(":direccionE", $datos["direccion_enviador"], PDO::PARAM_STR);
-                    $stmt->execute();
-                    $idClienteE = $db->lastInsertId(); // Corrección aquí
-                }
+                $idClienteE = $db->lastInsertId();
             }
 
             // Verificar si el cliente receptor ya existe
@@ -211,51 +228,55 @@ class ModeloPaquetes
                 $stmt->bindParam(":telefonoR", $datos["telefono_remitente"], PDO::PARAM_STR);
                 $stmt->bindParam(":direccionR", $datos["direccion_remitente"], PDO::PARAM_STR);
                 $stmt->execute();
-                $idClienteR = $db->lastInsertId(); // Corrección aquí
+                $idClienteR = $db->lastInsertId();
             }
 
-            // Insertar datos en la tabla detelleEncomienda, incluyendo el peso
-            $stmt = $db->prepare("INSERT INTO detelleEncomienda (descripcion, cantidad, precio, tipo, peso) VALUES (:descripcion, :cantidad, :precio, :tipo, :peso)");
+            // Insertar detalles del paquete (peso, cantidad y descripción)
+            $stmt = $db->prepare("INSERT INTO detalleEncomienda (descripcion, cantidad, peso, idCategoria) VALUES (:descripcion, :cantidad, :peso, :idCategoria)");
             $stmt->bindParam(":descripcion", $datos["descripcion"], PDO::PARAM_STR);
             $stmt->bindParam(":cantidad", $datos["cantidad"], PDO::PARAM_INT);
-            $stmt->bindParam(":precio", $datos["precio"], PDO::PARAM_STR);
-            $stmt->bindParam(":tipo", $datos["tipoPaquete"], PDO::PARAM_INT);
-            $stmt->bindParam(":peso", $datos["peso"], PDO::PARAM_STR); // Agregar el peso
+            $stmt->bindParam(":peso", $datos["peso"], PDO::PARAM_STR);
+            $stmt->bindParam(":idCategoria", $datos["tipoPaquete"], PDO::PARAM_INT); // Esto es el tipo de paquete (categoría)
             $stmt->execute();
-            $idDetalle = $db->lastInsertId(); // Corrección aquí
+            $idDetalle = $db->lastInsertId();
 
-            // Insertar datos en la tabla recepcionencomienda, incluyendo las sucursales y el usuario
-            $stmt = $db->prepare("INSERT INTO $tabla (
-        nro_registro, estadoPaquete, FechaRecepcion, TipoEnvio, EstadoPago, idclienteE, idclienteR, idSucursalR, idSucursalE, idDetalle, idUsuario
-    ) VALUES (
-        :nro_registro, :estadoPaquete, :FechaRecepcion, :TipoEnvio, :EstadoPago, :idclienteE, :idclienteR, :idSucursalR, :idSucursalE, :idDetalle, :idUsuario
-    )");
+            // Insertar el pago
+            $stmt = $db->prepare("INSERT INTO pagos (idTransaccion, metodoPago, estadoPago, monto) VALUES (:idTransaccion, :metodoPago, :estadoPago, :monto)");
+            $stmt->bindParam(":idTransaccion", $datos["nro_registro"], PDO::PARAM_INT);
+            $stmt->bindParam(":metodoPago", $datos["metodoPago"], PDO::PARAM_INT);  // Efectivo, tarjeta, etc.
+            $stmt->bindParam(":estadoPago", $datos["estadoPago"], PDO::PARAM_INT);   // Inicialmente pendiente
+            $stmt->bindParam(":monto", $datos["precio"], PDO::PARAM_STR);            // Monto del pago
+            $stmt->execute();
+            $idPago = $db->lastInsertId(); // Obtenemos el ID del pago para asociarlo al paquete
 
-            // Bind parameters
-            $stmt->bindParam(":nro_registro", $datos["nro_registro"], PDO::PARAM_STR);
+            // Insertar el paquete en `recepcionEncomienda`
+            $stmt = $db->prepare("INSERT INTO $tabla (nro_registro, estadoPaquete, FechaRecepcion, TipoEnvio, idPagos, idClienteR, idClienteE, idSucursalR, idSucursalE, idDetalle, idUsuario) 
+            VALUES (:nro_registro, :estadoPaquete, :FechaRecepcion, :TipoEnvio, :idPagos, :idClienteR, :idClienteE, :idSucursalR, :idSucursalE, :idDetalle, :idUsuario)");
+
+            // Bind de parámetros
+            $stmt->bindParam(":nro_registro", $datos["nro_registro"], PDO::PARAM_INT);
             $stmt->bindParam(":estadoPaquete", $datos["estadoPaquete"], PDO::PARAM_INT);
             $stmt->bindParam(":FechaRecepcion", $datos["fechaRecepcion"], PDO::PARAM_STR);
             $stmt->bindParam(":TipoEnvio", $datos["tipoEnvio"], PDO::PARAM_INT);
-            $stmt->bindParam(":EstadoPago", $datos["estadoPago"], PDO::PARAM_INT);
-            $stmt->bindParam(":idclienteE", $idClienteE, PDO::PARAM_INT);
-            $stmt->bindParam(":idclienteR", $idClienteR, PDO::PARAM_INT);
+            $stmt->bindParam(":idPagos", $idPago, PDO::PARAM_INT);  // Asociar el ID del pago
+            $stmt->bindParam(":idClienteE", $idClienteE, PDO::PARAM_INT);
+            $stmt->bindParam(":idClienteR", $idClienteR, PDO::PARAM_INT);
             $stmt->bindParam(":idSucursalR", $datos["sucursalLlegada"], PDO::PARAM_INT);
             $stmt->bindParam(":idSucursalE", $datos["sucursalPartida"], PDO::PARAM_INT);
             $stmt->bindParam(":idDetalle", $idDetalle, PDO::PARAM_INT);
             $stmt->bindParam(":idUsuario", $datos["idUsuario"], PDO::PARAM_INT);
 
-            // Log de consulta SQL
-            error_log("Consulta SQL: " . $stmt->queryString);
-
             $stmt->execute();
-            $db->commit();
+            $db->commit(); // Si todo salió bien, hacemos commit de la transacción
             return "ok";
         } catch (PDOException $e) {
-            $db->rollBack();
-            echo "Error: " . $e->getMessage();
+            $db->rollBack(); // Si algo falla, revertimos la transacción
+            error_log("Error: " . $e->getMessage());
             return "error";
         }
     }
+
+
 
 
     public static function mdlIngresarPaqueteAPI($tabla, $datos)
@@ -357,8 +378,8 @@ class ModeloPaquetes
                 error_log("Nuevo cliente receptor creado. ID: " . $idClienteR . "\n");
             }
 
-            // Insertar datos en la tabla detelleEncomienda
-            $stmt = $db->prepare("INSERT INTO detelleEncomienda (descripcion, cantidad, precio, tipo, peso) VALUES (:descripcion, :cantidad, :precio, :tipo, :peso)");
+            // Insertar datos en la tabla detalleEncomienda
+            $stmt = $db->prepare("INSERT INTO detalleEncomienda (descripcion, cantidad, precio, tipo, peso) VALUES (:descripcion, :cantidad, :precio, :tipo, :peso)");
             $stmt->bindParam(":descripcion", $datos["descripcion"], PDO::PARAM_STR);
             $stmt->bindParam(":cantidad", $datos["cantidad"], PDO::PARAM_INT);
             $stmt->bindParam(":precio", $datos["precio"], PDO::PARAM_STR);
@@ -566,43 +587,22 @@ class ModeloPaquetes
 
     static public function mdlActualizarPaquete($tabla, $datos)
     {
-        $db = Conexion::conectar();
+        $stmt = Conexion::conectar()->prepare("UPDATE $tabla 
+                                               SET estadoPaquete = :estadoPaquete
 
-        try {
-            $db->beginTransaction();
+                                               WHERE id = :id");
 
-            // Actualizar el estado del paquete en recepcionencomienda
-            $stmt = $db->prepare("UPDATE $tabla SET estadoPaquete = :estadoPaquete, EstadoPago = :estadoPago WHERE id = :id");
-            $stmt->bindParam(":estadoPaquete", $datos["estadoPaquete"], PDO::PARAM_INT);
-            $stmt->bindParam(":estadoPago", $datos["estadoPago"], PDO::PARAM_INT);
-            $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
+        $stmt->bindParam(":estadoPaquete", $datos["estadoPaquete"], PDO::PARAM_INT);
+        $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
 
-            if ($stmt->execute()) {
-                // Registrar la entrega si el estado es "Entregado" (estadoPaquete = 3)
-                if ($datos["estadoPaquete"] == 3) {
-                    $stmtEntrega = $db->prepare("INSERT INTO entregaencomienda (fecha, idRecepcionEncomienda, idUsuario) VALUES (NOW(), :idRecepcionEncomienda, :idUsuario)");
-                    $stmtEntrega->bindParam(":idRecepcionEncomienda", $datos["id"], PDO::PARAM_INT);
-                    $stmtEntrega->bindParam(":idUsuario", $datos["idUsuario"], PDO::PARAM_INT);
-
-                    if (!$stmtEntrega->execute()) {
-                        $db->rollBack();
-                        error_log("Error al registrar la entrega.");
-                        return "error";
-                    }
-                }
-
-                $db->commit();
-                return "ok";
-            } else {
-                $db->rollBack();
-                error_log("Error al actualizar el paquete.");
-                return "error";
-            }
-        } catch (PDOException $e) {
-            $db->rollBack();
-            error_log("Error al actualizar paquete: " . $e->getMessage());
+        if ($stmt->execute()) {
+            return "ok";
+        } else {
             return "error";
         }
+
+        $stmt->close();
+        $stmt = null;
     }
     static public function mdlActualizarEstadoPago($tabla, $idPaquete, $estadoPago)
     {

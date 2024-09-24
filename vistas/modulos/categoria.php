@@ -87,25 +87,29 @@
   </section>
 </div>
 
-<!-- Modal -->
+<!-- Modal Agregar Categoría-->
 <div class="modal fade" id="agregarcategoria" tabindex="-1" role="dialog" aria-labelledby="addContactModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h5 class="modal-title"> <i class="ti ti-building-store text-blue me-1 fs-5"></i> Nueva Categoría</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header d-flex align-items-center bg-primary text-white">
+        <h5 class="modal-title text-white"> <i class="ti ti-building-store text-white me-1 fs-5"></i> Nueva Categoría</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="add-contact-box">
           <div class="add-contact-content">
             <form method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <input type="text" name="nuevoNombre" class="form-control" placeholder="Ingrese nombre de la categoría" required />
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoNombre" class="form-label"><i class="ti ti-id-badge me-2"></i>Nombre de la Categoría</label>
+                  <input type="text" name="nuevoNombre" class="form-control" placeholder="Ingrese nombre de la categoría" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="nuevoPrecio" class="form-label"><i class="ti ti-cash me-2"></i>Precio</label>
+                  <input type="text" name="nuevoPrecio" class="form-control" placeholder="Ingrese el precio" required />
+                </div>
               </div>
-              <div class="mb-3">
-                <input type="text" name="nuevoPrecio" class="form-control" placeholder="Ingrese el precio" required />
-              </div>
-              <button type="submit" class="btn btn-success">Agregar</button>
+              <button type="submit" class="btn btn-primary w-100">Agregar Categoría</button>
               <?php
               $crearCategoria = new ControladorCategoria();
               $crearCategoria->ctrCrearCategoria();
@@ -120,26 +124,31 @@
 
 
 
-<!-- Modal Editar Categoria -->
+
+<!-- Modal Editar Categoría -->
 <div class="modal fade" id="editarcategoria" tabindex="-1" role="dialog" aria-labelledby="editarcategoria" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h5 class="modal-title"> <i class="ti ti-building-store text-blue me-1 fs-5"></i> Editar Categoría</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header d-flex align-items-center bg-primary text-white">
+        <h5 class="modal-title text-white"> <i class="ti ti-building-store text-white me-1 fs-5"></i> Editar Categoría</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="edit-contact-box">
           <div class="edit-contact-content">
             <form method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <input type="hidden" name="idCategoria" id="idCategoria" required>
-                <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre de la categoría" required />
+              <input type="hidden" name="idCategoria" id="idCategoria" required>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="editarNombre" class="form-label"><i class="ti ti-id-badge me-2"></i>Nombre de la Categoría</label>
+                  <input type="text" name="editarNombre" id="editarNombre" class="form-control" placeholder="Ingrese nombre de la categoría" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="editarPrecio" class="form-label"><i class="ti ti-cash me-2"></i>Precio</label>
+                  <input type="text" name="editarPrecio" id="editarPrecio" class="form-control" placeholder="Ingrese el precio" required />
+                </div>
               </div>
-              <div class="mb-3">
-                <input type="text" name="editarPrecio" id="editarPrecio" class="form-control" placeholder="Ingrese el precio" required />
-              </div>
-              <button type="submit" class="btn btn-success">Guardar cambios</button>
+              <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
               <?php
               $editarCategoria = new ControladorCategoria();
               $editarCategoria->ctrEditarCategoria();

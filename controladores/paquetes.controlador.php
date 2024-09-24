@@ -4,6 +4,8 @@ require __DIR__ . '/../vendor/autoload.php'; // Asegúrate de que esta ruta es c
 // Asegúrate de que el path sea correcto según tu estructura de carpetas
 require_once __DIR__ . '/usuarios.controlador.php';
 
+require_once "/var/www/html/SistemaEncomiendas/modelos/pagos.modelo.php";  // Asegúrate de que esta línea está presente y bien escrita
+
 use Twilio\Rest\Client;
 use Dotenv\Dotenv;
 
@@ -17,40 +19,10 @@ class ControladorPaquetes
     {
         $tabla = "recepcionEncomienda";
         $envios = ModeloPaquetes::mdlObtenerEnviosPorUsuario($tabla, $idUsuario);
-    
+
         return $envios;
     }
-    
-    
 
-    public static function ctrVerificarEstadoPago($idPaquete)
-    {
-        $tabla = "paquetes"; // Ajusta esto al nombre de la tabla donde almacenas el estado de pago
-
-        // Llamar al modelo para obtener el estado del pago
-        $respuesta = ModeloPaquetes::mdlVerificarEstadoPago($tabla, $idPaquete);
-
-        // Devuelve el estado de pago
-        return $respuesta['estadoPago']; // Ajusta 'estadoPago' al nombre real de tu columna en la base de datos
-    }
-
-    public static function ctrActualizarPagoExitoso($idPaquete)
-    {
-        $estadoPago = '1';  // Pagado
-        $estadoPaquete = '3'; // Entregado (o el estado correspondiente)
-        $idUsuario = $_SESSION['idUsuario'];
-
-        $datos = array(
-            "id" => $idPaquete,
-            "estadoPaquete" => $estadoPaquete,
-            "estadoPago" => $estadoPago,
-            "idUsuario" => $idUsuario
-        );
-
-        $respuesta = self::ctrActualizarPaquete($datos);
-
-        return $respuesta;
-    }
     /*=============================================
     MOSTRAR PAQUETES
     =============================================*/
@@ -63,80 +35,104 @@ class ControladorPaquetes
 
     static public function ctrCrearPaquete()
     {
-        ob_start(); // Inicia el buffer de salida
         if (isset($_POST["cedula_enviador"])) {
-            if (preg_match('/^[0-9]+$/', $_POST["cedula_enviador"])) {
+            // En tu función ctrCrearPaquete o en cualquier parte donde se genere la salida
+            ob_start(); // Iniciar el buffer de salida
+            error_log("POST request received for package creation");
 
-                // Aquí puedes agregar logs para revisar qué datos están llegando
-                error_log("Datos recibidos: " . json_encode($_POST));
+            // Validación de campos requeridos
+            $errores = [];
 
-                // Continúa con el proceso normal
-                $proximoNumeroRegistro = self::ctrObtenerSiguienteNumeroRegistro();
+            // Validamos cada campo que esperamos recibir
+            if (!preg_match('/^[0-9]+$/', $_POST["cedula_enviador"])) {
+                $errores[] = "Cédula del enviador es inválida.";
+            }
+            if (empty($_POST["nombre_enviador"])) {
+                $errores[] = "El nombre del enviador no puede estar vacío.";
+            }
 
-                $tabla = "recepcionEncomienda";
-                $fechaRecepcion = date("Y-m-d H:i:s");
+            // Si hay errores, retornamos un JSON con los errores
+            if (!empty($errores)) {
+                error_log("Validation failed: " . implode(", ", $errores));
+                return json_encode(['status' => 'error', 'message' => implode(", ", $errores)]);
+            }
 
-                $sucursalLlegadaNombre = self::ctrObtenerNombreSucursal($_POST["sucursalLlegada"]);
-                $idUsuario = $_SESSION['idUsuario'];
+            // Si no hay errores, continuar con el proceso de registro
+            error_log("Validation passed, proceeding to insert data.");
 
-                $datos = array(
-                    "nro_registro" => (int)$proximoNumeroRegistro,
-                    "cedula_enviador" => (int)$_POST["cedula_enviador"],
-                    "nombre_enviador" => $_POST["nombre_enviador"],
-                    "telefono_enviador" => $_POST["telefono_enviador"],
-                    "direccion_enviador" => $_POST["direccion_enviador"],
-                    "cedula_remitente" => (int)$_POST["cedula_remitente"],
-                    "nombre_remitente" => $_POST["nombre_remitente"],
-                    "telefono_remitente" => $_POST["telefono_remitente"],
-                    "direccion_remitente" => $_POST["direccion_remitente"],
-                    "sucursalPartida" => (int)$_POST["sucursalPartida"],  // Convertir a entero
-                    "sucursalLlegada" => (int)$_POST["sucursalLlegada"],  // Convertir a entero
-                    "fechaRecepcion" => $fechaRecepcion, // No es necesario convertir datetime
-                    "tipoEnvio" => (int)$_POST["tipoEnvio"],  // Convertir a tinyint
-                    "estadoPago" => 0,
-                    "estadoPaquete" => 0,
-                    "descripcion" => $_POST["descripcion"],
-                    "cantidad" => (int)$_POST["cantidad"],  // Convertir a entero
-                    "precio" => (float)$_POST["precio"],  // Convertir a flotante
-                    "tipoPaquete" => (int)$_POST["tipoPaquete"],  // Convertir a tinyint
-                    "peso" => (float)$_POST["pesoPaquete"],  // Agregar el peso como flotante
-                    "idUsuario" => (int)$idUsuario  // Convertir a entero
+            $proximoNumeroRegistro = self::ctrObtenerSiguienteNumeroRegistro();
+            error_log("Next registration number: $proximoNumeroRegistro");
+
+            $tabla = "recepcionEncomienda";
+            $fechaRecepcion = date("Y-m-d H:i:s");
+            $sucursalLlegadaNombre = self::ctrObtenerNombreSucursal($_POST["sucursalLlegada"]);
+            $idUsuario = $_SESSION['idUsuario'];
+
+            // Preparamos los datos para la inserción
+            $datos = array(
+                "nro_registro" => (int)$proximoNumeroRegistro,
+                "cedula_enviador" => (int)$_POST["cedula_enviador"],
+                "nombre_enviador" => $_POST["nombre_enviador"],
+                "telefono_enviador" => $_POST["telefono_enviador"],
+                "direccion_enviador" => $_POST["direccion_enviador"],
+                "cedula_remitente" => (int)$_POST["cedula_remitente"],
+                "nombre_remitente" => $_POST["nombre_remitente"],
+                "telefono_remitente" => $_POST["telefono_remitente"],
+                "direccion_remitente" => $_POST["direccion_remitente"],
+                "sucursalPartida" => (int)$_POST["sucursalPartida"],
+                "sucursalLlegada" => (int)$_POST["sucursalLlegada"],
+                "fechaRecepcion" => $fechaRecepcion,
+                "tipoEnvio" => $_POST["tipoPaquete"],  // Siempre "Normal"
+                "estadoPaquete" => 0,  // Estado "Recepcionado"
+                "descripcion" => $_POST["descripcion"],
+                "cantidad" => (int)$_POST["cantidad"],
+                "precio" => (float)$_POST["precio"],
+                "tipoPaquete" => (int)$_POST["tipoPaquete"],
+                "peso" => (float)$_POST["pesoPaquete"],
+                "idUsuario" => (int)$idUsuario
+            );
+
+            error_log("Datos para insertar: " . json_encode($datos));
+
+            // Insertar los datos del paquete
+            $respuesta = ModeloPaquetes::mdlIngresarPaquete($tabla, $datos);
+
+            if ($respuesta == "ok") {
+                error_log("Package insertion successful.");
+
+                // Registrar el pago
+                $pagoData = array(
+                    "idTransaccion" => $proximoNumeroRegistro,
+                    "metodoPago" => 0,  // No pagado inicialmente
+                    "estadoPago" => 0,  // Por pagar
+                    "monto" => (float)$_POST["precio"]
                 );
+                $idPago = ModeloPagos::mdlCrearPago("pagos", $pagoData);
 
-                error_log("Datos para insertar: " . json_encode($datos));
+                error_log("Payment record created with ID: $idPago");
 
-                $respuesta = ModeloPaquetes::mdlIngresarPaquete($tabla, $datos);
+                // Actualizar el paquete con el id del pago
+                ModeloPaquetes::mdlActualizarPagoEnPaquete($tabla, $proximoNumeroRegistro, $idPago);
 
-                if ($respuesta == "ok") {
-                    self::enviarNotificacionWhatsApp(
-                        $_POST["telefono_remitente"],
-                        $_POST["nombre_remitente"],
-                        $proximoNumeroRegistro,
-                        $sucursalLlegadaNombre
-                    );
-
-                    $idPaquete = ModeloPaquetes::mdlObtenerUltimoId($tabla);
-                    ob_end_clean();
-                    echo json_encode(['status' => 'ok', 'id' => $idPaquete]);
-                    exit();
-                } else {
-                    ob_end_clean();
-                    echo json_encode(['status' => 'error']);
-                    exit();
-                }
+                // Notificación por WhatsApp
+                self::enviarNotificacionWhatsApp(
+                    $_POST["telefono_remitente"],
+                    $_POST["nombre_remitente"],
+                    $proximoNumeroRegistro,
+                    $sucursalLlegadaNombre
+                );
+                ob_end_clean(); // Limpiar el buffer de salida antes de devolver la respuesta
+                // Devolver la respuesta en formato JSON con el id del paquete creado
+                return ['status' => 'ok', 'idPaquete' => $proximoNumeroRegistro];
             } else {
-                ob_end_clean();
-                echo json_encode(['status' => 'error']);
-                exit();
+                error_log("Failed to insert package. Data: " . json_encode($datos));
+                return ['status' => 'error', 'message' => 'No se pudo registrar el paquete.'];
             }
         } else {
-            ob_end_clean();
-            echo json_encode(['status' => 'error']);
-            exit();
+            error_log("No POST data received for package creation.");
+            return ['status' => 'error', 'message' => 'No se recibieron los datos necesarios para el registro.'];
         }
     }
-
-
     public static function ctrCrearPaqueteAPI($data, $userId)
     {
         try {
@@ -256,18 +252,6 @@ class ControladorPaquetes
         return $precioPorPeso + $precioPorTipo;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     /*=============================================
     OBTENER NOMBRE DE SUCURSAL
     =============================================*/
@@ -309,22 +293,28 @@ class ControladorPaquetes
     }
 
 
-
-    // Otros métodos...
     static public function ctrActualizarPaquete($datos)
     {
-        $tabla = "recepcionEncomienda";
+        $tabla = "recepcionEncomienda"; // Tabla principal
+
+        // Actualizar el estado del paquete
         $respuesta = ModeloPaquetes::mdlActualizarPaquete($tabla, $datos);
 
-        return $respuesta;
+        // Si el paquete se actualiza correctamente, actualizar el estado del pago
+        if ($respuesta == "ok" && isset($datos["idPagos"])) {
+            $estadoPago = $datos["estadoPago"]; // Asegúrate de que el estadoPago se envíe correctamente
+            $idPagos = $datos["idPagos"];
+            $respuestaPago = ModeloPagos::mdlActualizarEstadoPago($idPagos, $estadoPago);
+
+            if ($respuestaPago == "ok") {
+                return "ok";
+            } else {
+                return "error";
+            }
+        } else {
+            return "error";
+        }
     }
-
-
-
-
-
-
-
 
 
     /*=============================================
