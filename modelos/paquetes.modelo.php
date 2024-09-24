@@ -29,6 +29,14 @@ class ModeloPaquetes
             return "error";
         }
     }
+    static public function mdlObtenerPrecio($idPagos)
+    {
+        // Ajustamos la consulta para obtener el monto desde la tabla pagos
+        $stmt = Conexion::conectar()->prepare("SELECT monto FROM pagos WHERE id = :idPagos");
+        $stmt->bindParam(":idPagos", $idPagos, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
 
     public static function mdlObtenerEnviosPorUsuario($tabla, $idUsuario)
     {

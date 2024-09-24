@@ -221,6 +221,8 @@
                     </div>
                     <div class="modal-body" id="modal-body-content">
                       <input type="hidden" id="idPaquete" name="idPaquete" value="">
+                      <input type="hidden" id="idPagos" name="idPagos" value="">
+
                       <!-- Aquí se cargarán los datos del envío -->
 
                     </div>

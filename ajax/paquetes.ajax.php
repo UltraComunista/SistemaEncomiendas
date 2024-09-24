@@ -62,4 +62,14 @@ if (isset($_POST['action'])) {
             echo json_encode(['status' => 'error', 'message' => 'No se pudo actualizar el estado.']);
         }
     }
+    if ($action == 'getPrecio') {
+        $idPaquete = $_POST['idPaquete'];
+        $response = ModeloPaquetes::mdlObtenerPrecio($idPaquete);
+
+        if ($response) {
+            echo json_encode(['status' => 'ok', 'precio' => $response['monto']]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No se pudo obtener el precio']);
+        }
+    }
 }

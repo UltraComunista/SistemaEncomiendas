@@ -102,10 +102,16 @@ $(document).on("click", ".btnEditarPaquete", function () {
     method: "POST",
     data: { idPaquete: idPaquete, action: 'get' },
     dataType: "json",
+
     success: function (response) {
+      console.log(response); // Verificar el contenido completo de response
       if (response) {
+        // Asegúrate de que el valor de precio está disponible
+        var precio = response.precio ? parseFloat(response.precio).toFixed(2) : 0.00;
+
         var htmlContent = `
-        <input type="hidden" id="idPagos" name="idPagos" value="${response.idPagos}">
+          <input type="text" class="form-control" id="precio" value="${precio}" readonly>
+          <input type="hidden" id="idPagos" name="idPagos" value="${response.idPagos}">
           <input type="hidden" id="idPaquete" name="idPaquete" value="${response.id}">
           <div class="container">
             <!-- Campos del formulario -->
@@ -131,7 +137,7 @@ $(document).on("click", ".btnEditarPaquete", function () {
               </div>
               <div class="col-md-6">
                 <label class="form-label">Precio:</label>
-                <input type="text" class="form-control" id="precio" value="${response.precio || 0.00}" readonly>
+                <input type="text" class="form-control" id="precio" value="${precio}" readonly>
               </div>
             </div>
             <div class="row mb-3">
@@ -142,9 +148,9 @@ $(document).on("click", ".btnEditarPaquete", function () {
               <div class="col-md-6">
                 <label class="form-label">Estado del Pago:</label>
                 <select class="form-select" id="estadoPago">
-                  <option value="0" ${response.EstadoPago == 0 ? 'selected' : ''}>Debe</option>
-                  <option value="1" ${response.EstadoPago == 1 ? 'selected' : ''}>Pagado</option>
-                  <option value="2" ${response.EstadoPago == 2 ? 'selected' : ''}>Pagado QR</option>
+                  <option value="0" ${response.estadoPago == 0 ? 'selected' : ''}>Debe</option>
+                  <option value="1" ${response.estadoPago == 1 ? 'selected' : ''}>Pagado</option>
+                  <option value="2" ${response.estadoPago == 2 ? 'selected' : ''}>Pagado QR</option>
                 </select>
               </div>
             </div>
@@ -161,21 +167,128 @@ $(document).on("click", ".btnEditarPaquete", function () {
   });
 });
 
-
 $(document).on("click", "#update-status-btn", function () {
   var idPaquete = $("#idPaquete").val();
   var estadoPaquete = $("#estadoPaquete").val();
   var estadoPago = $("#estadoPago").val();
-  var idPagos = $("#idPagos").val(); // Asegúrate de que el idPagos esté en el formulario
+  var idPagos = $("#idPagos").val();
 
+  // Si el estado de pago es QR, hacemos la petición para generar el QR primero
+  if (estadoPago == 2) { // 2 es el valor de "Pagado QR"
+
+    Swal.fire({
+      title: 'Generando QR...',
+      text: 'Por favor espere mientras obtenemos el monto y generamos el código QR',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    // Hacemos una solicitud AJAX para obtener el precio
+    $.ajax({
+      url: 'ajax/paquetes.ajax.php',
+      method: 'POST',
+      data: {
+        idPaquete: idPaquete,
+        action: 'getPrecio'  // Acción para obtener el precio
+      },
+      success: function (response) {
+        console.log("Respuesta del servidor para obtener el precio: ", response);  // Verificar la respuesta
+        var res = JSON.parse(response);
+
+        if (res.status == 'ok') {
+          var monto = res.precio;
+          console.log("Precio obtenido: ", monto);  // Verificar el monto obtenido
+
+          // Ahora generamos el QR con el monto obtenido
+          generarQR(monto, idPaquete, estadoPaquete, estadoPago, idPagos);
+
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo obtener el precio del paquete.',
+            icon: 'error'
+          });
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error('Error en la solicitud AJAX para obtener el precio:', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'Ocurrió un error al obtener el precio.',
+          icon: 'error'
+        });
+      }
+    });
+
+  } else {
+    // Si no es "Pagado QR", simplemente actualizamos el estado
+    actualizarEstadoPaquete(idPaquete, estadoPaquete, estadoPago, idPagos);
+  }
+});
+
+// Función para generar el QR después de obtener el precio
+function generarQR(monto, idPaquete, estadoPaquete, estadoPago, idPagos) {
+  console.log("Monto recibido para generar QR:", monto); // Verificar el monto antes de generar el QR
+  // Hacemos una solicitud AJAX para generar el QR
   $.ajax({
-    url: "ajax/paquetes.ajax.php",
-    method: "POST",
+    url: 'ajax/generar_qr.php', // Archivo PHP que manejará la generación del QR
+    method: 'POST',
+    data: {
+      monto: monto // Enviamos el monto para generar el QR
+    },
+    success: function (response) {
+      console.log("Respuesta de generar_qr.php: ", response);  // Verificar la respuesta del servidor
+      var res = JSON.parse(response);
+      if (res.Codigo == 0) {
+        // Si se generó correctamente, mostramos el QR en un SweetAlert
+        var qrImage = 'data:image/png;base64,' + res.Data.qr;
+        console.log("QR generado (base64):", qrImage);  // Verificar el QR generado
+
+        Swal.fire({
+          title: 'Código QR Generado',
+          html: 'Escanea el siguiente QR para realizar el pago.',
+          imageUrl: qrImage,
+          imageWidth: 300,
+          imageHeight: 300,
+          showCancelButton: true,
+          cancelButtonText: 'Cerrar', // Cambiamos el texto a "Cerrar" para mayor claridad
+          showConfirmButton: false,   // No mostrar botón de confirmación
+        });
+
+      } else {
+        Swal.fire({
+          title: 'Error',
+          text: res.Mensaje || 'No se pudo generar el código QR.',
+          icon: 'error'
+        });
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error('Error en la solicitud AJAX:', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'Ocurrió un error al generar el código QR.',
+        icon: 'error'
+      });
+    }
+  });
+}
+
+
+// Función para actualizar el estado del paquete
+function actualizarEstadoPaquete(idPaquete, estadoPaquete, estadoPago, idPagos) {
+  console.log("Actualizando el estado del paquete. ID:", idPaquete);  // Verificar el ID del paquete
+  $.ajax({
+    url: 'ajax/paquetes.ajax.php',
+    method: 'POST',
     data: {
       idPaquete: idPaquete,
       estadoPaquete: estadoPaquete,
       estadoPago: estadoPago,
-      idPagos: idPagos,  // Pasar el ID de pagos
+      idPagos: idPagos,
       action: 'updateStatus'
     },
     dataType: "json",
@@ -205,7 +318,9 @@ $(document).on("click", "#update-status-btn", function () {
       });
     }
   });
-});
+}
+
+
 
 
 
